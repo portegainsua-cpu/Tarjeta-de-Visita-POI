@@ -7,65 +7,97 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #334155;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
         .card {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            background: #ffffff;
+            padding: 35px 25px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             text-align: center;
-            max-width: 350px;
+            max-width: 360px;
             width: 100%;
+            border-top: 5px solid #3b82f6; /* Detalle azul tecnológico */
+        }
+        .profile-img {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #3b82f6;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
         }
         h1 {
             font-size: 24px;
-            margin-bottom: 5px;
-            color: #2c3e50;
+            margin: 10px 0 5px 0;
+            color: #0f172a; /* Azul muy oscuro para el nombre */
+            font-weight: 700;
         }
-        p {
-            font-size: 16px;
-            color: #7f8c8d;
+        .subtitle {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #3b82f6; /* Azul corporativo */
+            margin-bottom: 15px;
+        }
+        .description {
+            font-size: 15px;
+            color: #64748b;
+            line-height: 1.5;
             margin-top: 0;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         .btn {
             display: block;
-            background-color: #2ecc71;
+            background-color: #0f172a; /* Botón primario serio/elegante */
             color: white;
             padding: 12px;
-            margin: 10px 0;
-            border-radius: 8px;
+            margin: 12px 0;
+            border-radius: 10px;
             text-decoration: none;
             font-weight: bold;
-            transition: background 0.3s;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(15, 23, 42, 0.1);
         }
         .btn:hover {
-            background-color: #27ae60;
+            background-color: #1e293b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(15, 23, 42, 0.15);
         }
-        .btn-secondary {
-            background-color: #34495e;
+        .btn-highlight {
+            background-color: #3b82f6; /* Botón de contacto llamativo */
         }
-        .btn-secondary:hover {
-            background-color: #2c3e50;
+        .btn-highlight:hover {
+            background-color: #2563eb;
+            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
         }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h1>Pablo Ortega Insúa</h1>
-        <p>Soluciones con Inteligencia Artificial & Automatizaciones No-Code (Make)</p>
+        <!-- Cargamos tu foto subida al repositorio -->
+        <img src="perfil.png" alt="Pablo Ortega Insúa" class="profile-img">
         
-        <!-- Cambia las URLs de ejemplo por tus enlaces reales -->
-        <a href="www.linkedin.com/in/pablo-ortega-insúa-775b92277" target="_blank" class="btn btn-secondary">LinkedIn</a>
-        <a href="portegainsprofesional@gmail.com" class="btn">Contactar por Email</a>
+        <h1>Pablo Ortega Insúa</h1>
+        <div class="subtitle">IA & Automatización No-Code</div>
+        
+        <p class="description">Ayudo a empresas a optimizar tiempo y reducir costes diseñando ecosistemas inteligentes y automatizaciones eficientes con Make.</p>
+        
+        <!-- Recuerda cambiar estas URLs por las tuyas reales -->
+        <a href="www.linkedin.com/in/pablo-ortega-insúa-775b92277" target="_blank" class="btn">Conectar en LinkedIn</a>
+        <a href="portegainsprofesional@gmail.com" class="btn btn-highlight">Escríbeme por Email</a>
     </div>
 
 </body>
