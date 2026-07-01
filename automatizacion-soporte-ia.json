@@ -1,0 +1,6 @@
+{
+  "name": "Filtro de Soporte con IA",
+  "trigger": "Nuevo correo recibido",
+  "action_1": "Enviar texto a OpenAI para analizar sentimiento",
+  "action_2": "Guardar en Google Sheets si es urgente"
+}
