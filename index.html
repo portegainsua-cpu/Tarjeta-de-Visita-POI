@@ -556,7 +556,7 @@
             </a>
 
             <!-- CTA 6: Email -->
-            <a href="mailto:portegainsprofesional@gmail.com" class="action-item animate-item delay-9">
+            <a href="mailto:portegainsprofesional@gmail.com" onclick="handleEmailClick(event)" class="action-item animate-item delay-9">
                 <div class="action-icon">
                     <!-- Mail Icon -->
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -686,6 +686,30 @@
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
+        }
+
+        // Manejar el clic en el botón de email (copiado y mailto)
+        function handleEmailClick(event) {
+            const email = "portegainsprofesional@gmail.com";
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(email)
+                    .then(() => {
+                        showToast("¡Correo copiado! Abriendo app de email... ✉️");
+                    })
+                    .catch(() => {
+                        showToast("Abriendo tu aplicación de correo... ✉️");
+                    });
+            } else {
+                // Fallback de copiado antiguo
+                const tempInput = document.createElement("input");
+                tempInput.value = email;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempInput);
+                showToast("¡Correo copiado! Abriendo app de email... ✉️");
+            }
         }
     </script>
 </body>
