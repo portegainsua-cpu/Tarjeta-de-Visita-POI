@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "Pablo Ortega Insúa · AI Resolution Labs",
+  "short_name": "Pablo Ortega",
+  "description": "Tarjeta de visita digital de Pablo Ortega Insúa, especialista en IA y automatización No-Code.",
+  "lang": "es",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#030712",
+  "theme_color": "#030712",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "img/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
