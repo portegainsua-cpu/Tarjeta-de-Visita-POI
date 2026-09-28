@@ -7,7 +7,7 @@
         // URL de la aplicación web de Apps Script (Implementar → Gestionar implementaciones).
         ENDPOINT: 'https://script.google.com/macros/s/AKfycbzCgaigJtDxVea-eIOW5tq_OZKyM_AU4Bv7mUer4SZhgpuEOlUX0wJQLEbWa500PQMFIg/exec',
         // Clave del sitio de Turnstile (es pública). Clave de prueba: 1x00000000000000000000AA
-        TURNSTILE_SITEKEY: 'PENDIENTE_SITEKEY',
+        TURNSTILE_SITEKEY: '0x4AAAAAAFIFiqOfy6ts7wC6',
         VERSION_TEXTO_LEGAL: '2026-09-25',
         TIEMPO_MAXIMO_MS: 25000,
         EMAIL_CONTACTO: 'info@airesolutionlabs.com'

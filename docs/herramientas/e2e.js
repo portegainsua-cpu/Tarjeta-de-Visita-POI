@@ -149,14 +149,11 @@ async function registro() {
   turnstileRoto = false;
   ok('Turnstile bloqueado: explica el motivo y ofrece el email');
 
-  // 9. Sin configurar (producción antes de pegar la URL) → no envía
-  await page.goto(BASE + '/tarjeta/');
-  await page.fill('#nombre', 'Luis'); await page.fill('#negocio', 'Taller Luis');
-  await page.selectOption('#sector', 'Otro'); await page.fill('#whatsapp', '611222333');
-  await page.fill('#email', 'luis@ejemplo.com'); await page.check('#privacidad');
-  await page.click('button[type=submit]');
-  await page.waitForSelector('#alternativa.visible');
-  ok('sin URL configurada: no intenta enviar');
+  // 9. Configuración de producción: URL del Apps Script y clave de Turnstile reales
+  const js = await (await fetch(BASE + '/assets/formularios.js')).text();
+  assert.ok(!/ENDPOINT: 'PENDIENTE|TURNSTILE_SITEKEY: 'PENDIENTE/.test(js));
+  assert.ok(/TURNSTILE_SITEKEY: '0x[0-9A-Za-z_-]+'/.test(js));
+  ok('producción: URL del Apps Script y clave de Turnstile configuradas');
 
   // 10. Privacidad y escritorio
   await page.goto(BASE + '/privacidad/');
