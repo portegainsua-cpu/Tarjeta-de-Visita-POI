@@ -167,6 +167,29 @@ prueba('campos obligatorios vacíos y valores fuera de lista', () => {
   assert.strictEqual(env.filas.length, 0);
 });
 
+prueba('sector "Otro": guarda el sector escrito y lo exige', () => {
+  const env = crearEntorno();
+  const e = tarjetaOk(); e.datos.sector = 'Otro'; e.datos.sector_otro = '  Fotografía   de bodas ';
+  assert.strictEqual(post(env, e).ok, true);
+  const f = Object.fromEntries(env.cabeceras.map((h, i) => [h, env.filas[0][i]]));
+  assert.strictEqual(f['Sector'], 'Otro: Fotografía de bodas');
+  assert.ok(env.enviados[0].texto.includes('Otro: Fotografía de bodas'));
+
+  const sinTexto = tarjetaOk(); sinTexto.datos.sector = 'Otro'; sinTexto.datos.email = 'otra@ejemplo.com';
+  assert.deepStrictEqual(post(env, sinTexto).campos, ['sector_otro']);
+
+  const a = automatizaOk(); a.datos.sector = 'Otro'; a.datos.sector_otro = 'X';
+  assert.deepStrictEqual(post(env, a).campos, ['sector_otro']);
+});
+
+prueba('sector de la lista: ignora el texto de "Otro"', () => {
+  const env = crearEntorno();
+  const e = tarjetaOk(); e.datos.sector_otro = 'lo que sea';
+  assert.strictEqual(post(env, e).ok, true);
+  const f = Object.fromEntries(env.cabeceras.map((h, i) => [h, env.filas[0][i]]));
+  assert.strictEqual(f['Sector'], 'Salud y bienestar');
+});
+
 prueba('automatiza: pide WhatsApp si el contacto preferido no es email', () => {
   const env = crearEntorno();
   const e = automatizaOk(); e.datos.contacto = 'WhatsApp';

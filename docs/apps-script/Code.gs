@@ -15,7 +15,7 @@
  */
 
 const AJUSTES = {
-  VERSION: '1.0.0',
+  VERSION: '1.1.0',
   HOJA: 'Solicitudes',
   HOJA_RESUMEN: 'Resumen',
   AVISO_A: '',                          // vacío = la propia cuenta de Gmail (llega a la bandeja de entrada)
@@ -184,6 +184,12 @@ function validar_(entrada) {
     comunicaciones: c.comunicaciones === true ? 'Sí' : 'No',
     versionTexto: texto_(c.version_texto, 0, 20, false, 'version_texto', errores) || '',
   };
+
+  // Si el sector es "Otro", el cliente escribe el suyo: se guarda como "Otro: <sector>"
+  if (reg.sector === 'Otro') {
+    const cual = texto_(d.sector_otro, 2, 60, true, 'sector_otro', errores);
+    if (cual) reg.sector = 'Otro: ' + cual;
+  }
 
   if (formulario === 'tarjeta') {
     reg.negocio = texto_(d.negocio, 2, 80, true, 'negocio', errores);

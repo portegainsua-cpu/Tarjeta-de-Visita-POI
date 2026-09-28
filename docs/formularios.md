@@ -51,6 +51,7 @@ Pruebas automáticas del script (con servicios de Google simulados): `node test.
 - Textos de los formularios: `tarjeta/index.html` y `automatiza/index.html`.
 - Si cambias `assets/formularios.css` o `assets/formularios.js`, sube el `?v=` en las tres páginas que los cargan.
 - Opciones de los desplegables y casillas: están en el HTML **y** en `OPCIONES` de `Code.gs`. Tienen que coincidir o el servidor rechazará el envío.
+- Sector "Otro": al elegirlo aparece "¿Cuál es tu sector?" (campo `sector_otro`, obligatorio, de 2 a 60 caracteres). En la hoja se guarda en la columna Sector como `Otro: <lo que escriba>`.
 
 ## Límites que conviene conocer
 
