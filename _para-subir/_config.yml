@@ -1,0 +1,6 @@
+# GitHub Pages (Jekyll): archivos del repositorio que NO se publican en la web.
+# Siguen visibles en GitHub (el repo es público), pero no en founder.airesolutionlabs.com.
+exclude:
+  - docs
+  - CLAUDE.md
+  - README.md

@@ -1,0 +1,15 @@
+CÓMO SUBIR ESTOS ARCHIVOS A GITHUB (tarjeta founder.airesolutionlabs.com)
+
+1. Abre https://github.com/portegainsua-cpu/Tarjeta-de-Visita-POI
+2. Comprueba arriba a la izquierda que estás en la rama "main".
+3. Pulsa "Add file" > "Upload files".
+4. Selecciona TODO lo que hay en esta carpeta EXCEPTO este archivo LEEME
+   (carpetas assets, automatiza, docs, privacidad, tarjeta y los archivos
+   _config.yml, CLAUDE.md, index.html, README.md y sitemap.xml)
+   y arrástralo a la ventana de GitHub. Las carpetas se suben con su contenido.
+   Los archivos que ya existen (index.html, sitemap.xml, README.md, CLAUDE.md,
+   docs/brief-formularios.md) se reemplazan.
+5. Abajo, en "Commit changes", escribe: Formularios propios en /tarjeta/ y /automatiza/
+6. Deja marcado "Commit directly to the main branch" y pulsa "Commit changes".
+7. En 1-2 minutos GitHub Pages publica los cambios. Prueba en el móvil:
+   https://founder.airesolutionlabs.com/tarjeta/
