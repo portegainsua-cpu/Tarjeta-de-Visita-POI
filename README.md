@@ -3,8 +3,10 @@
 Tarjeta de visita virtual de [AI Resolution Labs](https://www.airesolutionlabs.com/),
 publicada en **https://founder.airesolutionlabs.com**.
 
-Una sola página con accesos directos para contactar: formulario de automatización,
+Una página con accesos directos para contactar: formulario de automatización,
 reserva de cita, solicitud de tarjeta propia, web corporativa, LinkedIn y email.
+Los dos formularios son páginas propias (`/automatiza/` y `/tarjeta/`) que envían
+los datos a un Google Apps Script; ver `docs/formularios.md`.
 Incluye botones para **guardar el contacto** (descarga una vCard `.vcf`) y
 **compartir** la tarjeta (menú nativo del móvil o copia del enlace). Se puede
 **instalar como app** (PWA) y funciona sin conexión.
@@ -16,6 +18,11 @@ Es también la base de la plantilla de tarjetas para clientes.
 | Archivo | Para qué sirve |
 |---|---|
 | `index.html` | La tarjeta: HTML, estilos (`<style>`) y script (`<script>`). |
+| `tarjeta/`, `automatiza/` | Formularios "Tu tarjeta digital gratis" y "Automatiza tu negocio". |
+| `privacidad/` | Política de privacidad de los formularios. |
+| `assets/` | CSS y JS comunes de los formularios (`formularios.css`, `formularios.js`). |
+| `docs/` | Documentación interna y copia del Apps Script. No se publica (ver `_config.yml`). |
+| `_config.yml` | Excluye de la web `docs/`, `README.md` y `CLAUDE.md`. |
 | `manifest.webmanifest` | Datos de la app instalable: nombre, colores e iconos. |
 | `sw.js` | Service worker: caché y funcionamiento sin conexión. |
 | `img/` | Foto (`perfil-240/480.webp`), respaldo con iniciales (`perfil-fallback.svg`), imagen para redes (`og-image.jpg`) e iconos. |
@@ -44,6 +51,9 @@ Es también la base de la plantilla de tarjetas para clientes.
 ## Publicación
 
 GitHub Pages sirve la rama `main` tal cual, sin proceso de build.
+
+**Al cambiar `assets/formularios.css` o `assets/formularios.js`**, sube el número
+`?v=` con el que los cargan las páginas de `tarjeta/`, `automatiza/` y `privacidad/`.
 
 **Al cambiar una imagen, una fuente o el manifest sin cambiarle el nombre**,
 sube `CACHE_VERSION` en `sw.js` (`v1` → `v2`). Si no, quien ya tenga la tarjeta

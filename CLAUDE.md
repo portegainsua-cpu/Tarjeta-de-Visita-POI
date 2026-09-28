@@ -17,8 +17,14 @@ Repo: https://github.com/portegainsua-cpu/Tarjeta-de-Visita-POI
 
 ## Stack
 
-- HTML5 + CSS + JavaScript vanilla, todo en `index.html` (estilos en `<style>`,
-  lógica en `<script>`). Sin framework, sin `package.json` ni build.
+- HTML5 + CSS + JavaScript vanilla. La tarjeta está en `index.html` (estilos en
+  `<style>`, lógica en `<script>`). Sin framework, sin `package.json` ni build.
+- Formularios: `tarjeta/` y `automatiza/` con `assets/formularios.css` y
+  `assets/formularios.js` (cargados con `?v=N`: súbelo si los cambias). Envían a un
+  Google Apps Script (copia en `docs/apps-script/Code.gs`) con antispam Cloudflare
+  Turnstile. Detalles, URLs y cómo desplegar: `docs/formularios.md`.
+- Nunca poner en el repo la clave secreta de Turnstile ni otros secretos: van en
+  las propiedades del Apps Script.
 - Datos del script en el objeto `CONFIG` (inicio del `<script>`); colores en
   variables de `:root` (inicio del `<style>`). No añadir colores sueltos.
 - Fuente Outfit local en `fonts/` (woff2, font-display: swap). Sin dependencias externas.
