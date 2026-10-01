@@ -1,6 +1,7 @@
 /**
  * Formularios de AI Resolution Labs
- * Recibe los formularios de la tarjeta (founder.airesolutionlabs.com), comprueba el antispam,
+ * Recibe los formularios de la tarjeta (founder.airesolutionlabs.com) y el de contacto de la web
+ * (www.airesolutionlabs.com), comprueba el antispam,
  * guarda la solicitud en la hoja "Solicitudes", avisa a Pablo y envía la confirmación desde info@.
  *
  * Propiedades del script (Configuración del proyecto → Propiedades del script):
@@ -15,7 +16,7 @@
  */
 
 const AJUSTES = {
-  VERSION: '1.1.0',
+  VERSION: '1.2.0',
   HOJA: 'Solicitudes',
   HOJA_RESUMEN: 'Resumen',
   AVISO_A: '',                          // vacío = la propia cuenta de Gmail (llega a la bandeja de entrada)
@@ -24,8 +25,10 @@ const AJUSTES = {
   RESPONDER_A: 'info@airesolutionlabs.com',
   URL_CITA: 'https://cal.com/pablo-ortega-insua-wdoysa',
   URL_TARJETA: 'https://founder.airesolutionlabs.com/',
+  URL_WEB: 'https://www.airesolutionlabs.com/',
   PLAZO_TARJETA: '48 horas',            // PENDIENTE de confirmar por Pablo
-  PLAZO_AUTOMATIZA: '48 horas',         // PENDIENTE de confirmar por Pablo
+  PLAZO_AUTOMATIZA: '72 horas',
+  PLAZO_CONTACTO: '72 horas',
   HOSTS_PERMITIDOS: ['founder.airesolutionlabs.com', 'www.airesolutionlabs.com'],
   RELLENO_MINIMO_MS: 3000,
   MAX_ENVIOS_POR_EMAIL_HORA: 3,
@@ -41,6 +44,9 @@ const CABECERAS = [
   'Qué automatizar', 'Descripción', 'Contacto preferido', 'Referido', 'Acepta comunicaciones',
   'Versión texto legal', 'Confirmación', 'Notas',
 ];
+
+// Formularios admitidos y cómo aparecen en la columna "Formulario" de la hoja
+const NOMBRES_FORMULARIO = { tarjeta: 'Tarjeta', automatiza: 'Automatiza', contacto: 'Contacto' };
 
 const OPCIONES = {
   sector: ['Salud y bienestar', 'Estética y belleza', 'Abogacía y asesoría', 'Inmobiliaria',
@@ -168,7 +174,7 @@ function dentroDelLimite_(email) {
 function validar_(entrada) {
   const errores = [];
   const formulario = entrada.formulario;
-  if (formulario !== 'tarjeta' && formulario !== 'automatiza') return { ok: false, campos: ['formulario'] };
+  if (NOMBRES_FORMULARIO[formulario] === undefined) return { ok: false, campos: ['formulario'] };
   const d = entrada.datos && typeof entrada.datos === 'object' ? entrada.datos : {};
   const c = entrada.consentimientos && typeof entrada.consentimientos === 'object' ? entrada.consentimientos : {};
   if (c.privacidad !== true) errores.push('privacidad');
@@ -176,14 +182,23 @@ function validar_(entrada) {
   const reg = {
     formulario: formulario,
     nombre: texto_(d.nombre, 2, 80, true, 'nombre', errores),
-    sector: opcion_(d.sector, OPCIONES.sector, true, 'sector', errores),
+    sector: '',
     email: email_(d.email, true, errores),
     whatsapp: '', negocio: '', cargo: '', instagram: '', web: '', botones: '', mejorar: '',
-    tamano: '', que: '', descripcion: '', contacto: '',
+    tamano: '', que: '', descripcion: '', contacto: '', mensaje: '',
     referido: slug_(entrada.referido),
     comunicaciones: c.comunicaciones === true ? 'Sí' : 'No',
     versionTexto: texto_(c.version_texto, 0, 20, false, 'version_texto', errores) || '',
   };
+
+  // El formulario de contacto de la web solo pide nombre, email y mensaje
+  if (formulario === 'contacto') {
+    reg.mensaje = textoLargo_(d.mensaje, 10, 2000, true, 'mensaje', errores);
+    if (errores.length) return { ok: false, campos: unicos_(errores) };
+    return { ok: true, registro: reg };
+  }
+
+  reg.sector = opcion_(d.sector, OPCIONES.sector, true, 'sector', errores);
 
   // Si el sector es "Otro", el cliente escribe el suyo: se guarda como "Otro: <sector>"
   if (reg.sector === 'Otro') {
@@ -219,6 +234,22 @@ function limpiar_(v) {
 
 function texto_(v, min, max, obligatorio, campo, errores) {
   const s = limpiar_(v);
+  if (!s) {
+    if (obligatorio) errores.push(campo);
+    return '';
+  }
+  if (s.length < min || s.length > max) errores.push(campo);
+  return s;
+}
+
+/** Como texto_, pero conserva los saltos de línea (máximo dos seguidos). Para el mensaje de contacto. */
+function textoLargo_(v, min, max, obligatorio, campo, errores) {
+  const s = String(v == null ? '' : v)
+    .replace(/\r\n?/g, '\n')
+    .replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, ' ')
+    .split('\n').map(function (l) { return l.replace(/\s+/g, ' ').trim(); }).join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
   if (!s) {
     if (obligatorio) errores.push(campo);
     return '';
@@ -315,7 +346,7 @@ function guardar_(reg) {
   const valores = {
     'Fecha': reg.fecha,
     'ID': reg.id,
-    'Formulario': reg.formulario === 'tarjeta' ? 'Tarjeta' : 'Automatiza',
+    'Formulario': NOMBRES_FORMULARIO[reg.formulario],
     'Estado': 'Nuevo',
     'Nombre': reg.nombre,
     'Negocio / Empresa': reg.negocio,
@@ -329,7 +360,7 @@ function guardar_(reg) {
     'Qué más mejorar': reg.mejorar,
     'Tamaño': reg.tamano,
     'Qué automatizar': reg.que,
-    'Descripción': reg.descripcion,
+    'Descripción': reg.descripcion || reg.mensaje,
     'Contacto preferido': reg.contacto,
     'Referido': reg.referido,
     'Acepta comunicaciones': reg.comunicaciones,
@@ -396,13 +427,15 @@ function remitente_() {
 
 function enviarAviso_(reg, remitente) {
   const destino = AJUSTES.AVISO_A || Session.getEffectiveUser().getEmail();
-  const tipo = reg.formulario === 'tarjeta' ? 'Tarjeta gratis' : 'Automatiza';
-  const asunto = sinSaltos_((reg.notas ? '[PRUEBA] ' : '') + '[' + tipo + '] ' + reg.negocio + ' — ' + reg.nombre);
+  const tipo = { tarjeta: 'Tarjeta gratis', automatiza: 'Automatiza', contacto: 'Contacto web' }[reg.formulario];
+  const asunto = sinSaltos_((reg.notas ? '[PRUEBA] ' : '') + '[' + tipo + '] ' +
+    (reg.negocio ? reg.negocio + ' — ' : '') + reg.nombre);
   const filas = [
     ['Nombre', reg.nombre], ['Negocio / empresa', reg.negocio], ['Cargo', reg.cargo], ['Sector', reg.sector],
     ['WhatsApp', reg.whatsapp], ['Email', reg.email], ['Instagram', reg.instagram ? '@' + reg.instagram : ''],
     ['Web', reg.web], ['Botones', reg.botones], ['Qué más mejorar', reg.mejorar], ['Tamaño', reg.tamano],
-    ['Qué automatizar', reg.que], ['Descripción', reg.descripcion], ['Contacto preferido', reg.contacto],
+    ['Qué automatizar', reg.que], ['Descripción', reg.descripcion], ['Mensaje', reg.mensaje],
+    ['Contacto preferido', reg.contacto],
     ['Referido', reg.referido], ['Acepta comunicaciones', reg.comunicaciones], ['ID', reg.id],
   ].filter(function (f) { return f[1]; });
 
@@ -414,7 +447,7 @@ function enviarAviso_(reg, remitente) {
     '<table cellpadding="6" style="border-collapse:collapse">' +
     filas.map(function (f) {
       return '<tr><td style="color:#555;border-bottom:1px solid #eee">' + esc_(f[0]) +
-        '</td><td style="border-bottom:1px solid #eee">' + esc_(f[1]) + '</td></tr>';
+        '</td><td style="border-bottom:1px solid #eee">' + esc_(f[1]).replace(/\n/g, '<br>') + '</td></tr>';
     }).join('') +
     '</table>' +
     '<p>' + (wa ? '<a href="' + wa + '">Abrir WhatsApp</a> · ' : '') +
@@ -438,18 +471,28 @@ function enviarConfirmacion_(reg, remitente) {
         ' para pedirte la foto o el logo y terminarla. Si quieres adelantar, responde a este correo con tu logo o tu foto.',
       'Un saludo,',
     ];
+  } else if (reg.formulario === 'contacto') {
+    asunto = 'He recibido tu mensaje';
+    parrafos = [
+      'Hola, ' + nombre + ':',
+      'Gracias por escribir a AI Resolution Labs. He recibido tu mensaje y te responderé lo antes posible, ' +
+        'como máximo en ' + AJUSTES.PLAZO_CONTACTO + '.',
+      'Si prefieres adelantarlo, puedes reservar una videollamada conmigo aquí: ' + AJUSTES.URL_CITA,
+      'Un saludo,',
+    ];
   } else {
     asunto = 'He recibido tu consulta';
     parrafos = [
       'Hola, ' + nombre + ':',
-      'He recibido tu consulta sobre ' + reg.que.toLowerCase() + '. Te respondo en las próximas ' +
-        AJUSTES.PLAZO_AUTOMATIZA + '.',
+      'He recibido tu consulta sobre ' + reg.que.toLowerCase() + ' y te responderé lo antes posible, ' +
+        'como máximo en ' + AJUSTES.PLAZO_AUTOMATIZA + '.',
       'Si prefieres adelantarlo, puedes reservar una videollamada conmigo aquí: ' + AJUSTES.URL_CITA,
       'Un saludo,',
     ];
   }
-  const firma = ['Pablo Ortega Insúa', 'AI Resolution Labs', AJUSTES.URL_TARJETA];
-  const pie = 'Recibes este correo porque se ha enviado un formulario en ' + AJUSTES.URL_TARJETA +
+  const origen = reg.formulario === 'contacto' ? AJUSTES.URL_WEB : AJUSTES.URL_TARJETA;
+  const firma = ['Pablo Ortega Insúa', 'AI Resolution Labs', origen];
+  const pie = 'Recibes este correo porque se ha enviado un formulario en ' + origen +
     ' con esta dirección. Si no has sido tú, ignóralo o respóndenos y borraremos los datos.';
 
   const html =

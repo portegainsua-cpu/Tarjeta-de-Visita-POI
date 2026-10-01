@@ -113,6 +113,11 @@ prueba('automatiza válida: neutraliza fórmulas y ofrece Cal.com', () => {
   assert.strictEqual(f['Descripción'], '\'=HYPERLINK("x")');
   assert.strictEqual(f['Acepta comunicaciones'], 'Sí');
   assert.ok(env.enviados[1].texto.includes('cal.com'));
+  // Compromiso de plazo en la confirmación
+  assert.ok(env.enviados[1].texto.includes(
+    'He recibido tu consulta sobre citas y reservas y te responderé lo antes posible, como máximo en 72 horas.'));
+  assert.ok(env.enviados[1].o.htmlBody.includes('como máximo en 72 horas.'));
+  assert.ok(!env.enviados[1].texto.includes('próximas'));
 });
 
 prueba('campo trampa relleno: responde ok sin guardar ni enviar', () => {
@@ -195,6 +200,164 @@ prueba('automatiza: pide WhatsApp si el contacto preferido no es email', () => {
   const e = automatizaOk(); e.datos.contacto = 'WhatsApp';
   const r = post(env, e);
   assert.deepStrictEqual(r.campos, ['whatsapp']);
+});
+
+const contactoOk = () => ({
+  formulario: 'contacto',
+  datos: { nombre: ' Marta  Ruiz ', email: 'Marta@Ejemplo.com', mensaje: 'Hola:\r\n\r\n\r\n\r\nQuiero  automatizar las citas.\nPeluquería Marta' },
+  consentimientos: { privacidad: true, comunicaciones: false, version_texto: '2026-09-25' },
+  turnstile: 'ok-token', web_empresa: '', t_relleno: 6000,
+});
+const deLaWeb = { turnstile: { success: true, hostname: 'www.airesolutionlabs.com' } };
+const filaDe = (env, i = 0) => Object.fromEntries(env.cabeceras.map((h, j) => [h, env.filas[i][j]]));
+
+prueba('contacto válido desde la web: guarda en Solicitudes y envía aviso y confirmación', () => {
+  const env = crearEntorno(deLaWeb);
+  assert.deepStrictEqual(post(env, contactoOk()), { ok: true, id: 'abcdef12' });
+  const f = filaDe(env);
+  assert.strictEqual(f['Formulario'], 'Contacto');
+  assert.strictEqual(f['Estado'], 'Nuevo');
+  assert.strictEqual(f['Nombre'], 'Marta Ruiz');
+  assert.strictEqual(f['Email'], 'marta@ejemplo.com');
+  assert.strictEqual(f['Descripción'], 'Hola:\n\nQuiero automatizar las citas.\nPeluquería Marta');
+  for (const h of ['Sector', 'Negocio / Empresa', 'WhatsApp']) assert.strictEqual(f[h], '', h);
+
+  assert.strictEqual(env.enviados.length, 2);
+  const [aviso, conf] = env.enviados;
+  assert.strictEqual(aviso.to, 'cuenta@gmail.com');
+  assert.strictEqual(aviso.asunto, '[Contacto web] Marta Ruiz');
+  assert.strictEqual(aviso.o.replyTo, 'marta@ejemplo.com');
+  assert.ok(aviso.texto.includes('Mensaje: Hola:\n\nQuiero automatizar las citas.'));
+  assert.ok(aviso.o.htmlBody.includes('Hola:<br><br>Quiero automatizar las citas.<br>Peluquería Marta'));
+
+  assert.strictEqual(conf.to, 'marta@ejemplo.com');
+  assert.strictEqual(conf.o.from, 'info@airesolutionlabs.com');
+  assert.strictEqual(conf.asunto, 'He recibido tu mensaje');
+  assert.ok(conf.texto.startsWith('Hola, Marta:'));
+  // Compromiso de plazo
+  assert.ok(conf.texto.includes('Gracias por escribir a AI Resolution Labs. He recibido tu mensaje y ' +
+    'te responderé lo antes posible, como máximo en 72 horas.'));
+  assert.ok(conf.o.htmlBody.includes('como máximo en 72 horas.'));
+  assert.ok(!conf.texto.includes('próximas'));
+  assert.ok(conf.texto.includes('www.airesolutionlabs.com'));
+  assert.ok(!conf.texto.includes('founder.airesolutionlabs.com'));
+  // Texto fijo: no repite nada de lo que ha escrito
+  for (const trozo of ['automatizar', 'citas', 'Peluquería']) {
+    assert.ok(!conf.texto.includes(trozo), trozo);
+    assert.ok(!conf.o.htmlBody.includes(trozo), trozo);
+  }
+});
+
+// Envía un contacto modificado y devuelve la respuesta y el entorno (para ver si se guardó o se envió algo)
+function contactoCon(cambiar, opts = deLaWeb) {
+  const env = crearEntorno(opts);
+  const e = contactoOk();
+  cambiar(e);
+  return { r: post(env, e), env };
+}
+const nadaGuardado = (env) => { assert.strictEqual(env.filas.length, 0); assert.strictEqual(env.enviados.length, 0); };
+
+prueba('contacto: mensaje corto (menos de 10 caracteres) → rechazado', () => {
+  const { r, env } = contactoCon((e) => { e.datos.mensaje = '  Hola   ya '; });
+  assert.deepStrictEqual(r, { ok: false, error: 'validacion', campos: ['mensaje'] });
+  nadaGuardado(env);
+  assert.strictEqual(contactoCon((e) => { e.datos.mensaje = '1234567890'; }).r.ok, true);
+});
+
+prueba('contacto: mensaje largo (más de 2000 caracteres) → rechazado', () => {
+  const { r, env } = contactoCon((e) => { e.datos.mensaje = 'x'.repeat(2001); });
+  assert.deepStrictEqual(r, { ok: false, error: 'validacion', campos: ['mensaje'] });
+  nadaGuardado(env);
+  assert.strictEqual(contactoCon((e) => { e.datos.mensaje = 'x'.repeat(2000); }).r.ok, true);
+});
+
+prueba('contacto: sin mensaje → rechazado', () => {
+  const { r, env } = contactoCon((e) => { delete e.datos.mensaje; });
+  assert.deepStrictEqual(r.campos, ['mensaje']);
+  nadaGuardado(env);
+});
+
+prueba('contacto: sin email o con email mal escrito → rechazado', () => {
+  let { r, env } = contactoCon((e) => { delete e.datos.email; });
+  assert.deepStrictEqual(r, { ok: false, error: 'validacion', campos: ['email'] });
+  nadaGuardado(env);
+  ({ r, env } = contactoCon((e) => { e.datos.email = 'marta@ejemplo'; }));
+  assert.deepStrictEqual(r.campos, ['email']);
+  nadaGuardado(env);
+});
+
+prueba('contacto: sin aceptar la privacidad → rechazado', () => {
+  let { r, env } = contactoCon((e) => { e.consentimientos.privacidad = false; });
+  assert.deepStrictEqual(r, { ok: false, error: 'validacion', campos: ['privacidad'] });
+  nadaGuardado(env);
+  ({ r, env } = contactoCon((e) => { delete e.consentimientos; }));
+  assert.deepStrictEqual(r.campos, ['privacidad']);
+  nadaGuardado(env);
+});
+
+prueba('contacto: nombre vacío o de 1 letra → rechazado', () => {
+  for (const nombre of [undefined, ' ', 'M', 'x'.repeat(81)]) {
+    const { r, env } = contactoCon((e) => { e.datos.nombre = nombre; });
+    assert.deepStrictEqual(r.campos, ['nombre'], String(nombre));
+    nadaGuardado(env);
+  }
+});
+
+prueba('contacto: no exige campos de la tarjeta ni de automatiza', () => {
+  // Solo nombre, email y mensaje: sin sector, negocio, WhatsApp, botones, tamaño, etc.
+  const { r, env } = contactoCon((e) => { e.datos = { nombre: 'Marta', email: 'm@e.es', mensaje: 'Quiero información.' }; });
+  assert.strictEqual(r.ok, true);
+  assert.strictEqual(env.filas.length, 1);
+});
+
+prueba('contacto: campo trampa relleno → responde ok sin guardar ni enviar', () => {
+  const { r, env } = contactoCon((e) => { e.web_empresa = 'spam.com'; });
+  assert.deepStrictEqual(r, { ok: true, id: 'ok' });
+  nadaGuardado(env);
+});
+
+prueba('contacto: rellenado en menos de 3 s → responde ok sin guardar ni enviar', () => {
+  const { r, env } = contactoCon((e) => { e.t_relleno = 1200; });
+  assert.deepStrictEqual(r, { ok: true, id: 'ok' });
+  nadaGuardado(env);
+});
+
+prueba('contacto: Turnstile sin token, inválido o de otro dominio → rechazado', () => {
+  let { r, env } = contactoCon((e) => { e.turnstile = ''; });
+  assert.deepStrictEqual(r, { ok: false, error: 'verificacion' });
+  nadaGuardado(env);
+  ({ r, env } = contactoCon((e) => { e.turnstile = 'token-falso'; }, {}));
+  assert.deepStrictEqual(r, { ok: false, error: 'verificacion' });
+  ({ r, env } = contactoCon(() => {}, { turnstile: { success: true, hostname: 'airesolutionlabs.evil.com' } }));
+  assert.deepStrictEqual(r, { ok: false, error: 'verificacion' });
+  nadaGuardado(env);
+});
+
+prueba('contacto: límite de 3 envíos por email y hora', () => {
+  const env = crearEntorno(deLaWeb);
+  for (let i = 0; i < 3; i++) assert.strictEqual(post(env, contactoOk()).ok, true);
+  assert.deepStrictEqual(post(env, contactoOk()), { ok: false, error: 'limite' });
+  assert.strictEqual(env.filas.length, 3);
+});
+
+prueba('contacto: neutraliza fórmulas en Nombre y en Descripción (mensaje)', () => {
+  const { r, env } = contactoCon((e) => {
+    e.datos.nombre = '=IMPORTXML("x")';
+    e.datos.mensaje = '=HYPERLINK("http://x","clic aquí")';
+  });
+  assert.strictEqual(r.ok, true);
+  assert.strictEqual(filaDe(env)['Nombre'], '\'=IMPORTXML("x")');
+  assert.strictEqual(filaDe(env)['Descripción'], '\'=HYPERLINK("http://x","clic aquí")');
+  for (const inicio of ['+', '-', '@']) {
+    const o = contactoCon((e) => { e.datos.mensaje = inicio + 'SUM(A1:A9) mensaje'; e.datos.email = 'x' + inicio.charCodeAt(0) + '@e.es'; });
+    assert.strictEqual(filaDe(o.env)['Descripción'], "'" + inicio + 'SUM(A1:A9) mensaje', inicio);
+  }
+});
+
+prueba('contacto también se acepta desde founder (dominios permitidos)', () => {
+  const env = crearEntorno();
+  assert.strictEqual(post(env, contactoOk()).ok, true);
+  assert.strictEqual(post(crearEntorno(deLaWeb), tarjetaOk()).ok, true);
 });
 
 prueba('formulario desconocido y JSON roto', () => {

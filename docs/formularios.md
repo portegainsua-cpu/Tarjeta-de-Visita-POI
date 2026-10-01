@@ -8,6 +8,7 @@ Actualizado: 25/09/2026. Sustituye a `docs/brief-formularios.md` (propuesta inic
 |---|---|
 | Formulario "Tu tarjeta digital gratis" | `tarjeta/index.html` → https://founder.airesolutionlabs.com/tarjeta/ |
 | Formulario "Automatiza tu negocio" | `automatiza/index.html` → https://founder.airesolutionlabs.com/automatiza/ |
+| Formulario de contacto de la web | En www.airesolutionlabs.com (otro repo). Envía `formulario: "contacto"` con `nombre`, `email` y `mensaje` (10-2000 caracteres); se guarda en `Solicitudes` con Formulario = "Contacto" y el mensaje en la columna "Descripción" |
 | Política de privacidad | `privacidad/index.html` |
 | Estilos y lógica comunes | `assets/formularios.css`, `assets/formularios.js` |
 | Hoja de solicitudes | Google Sheets "Solicitudes AI Resolution Labs" (Drive de portegainsprofesional@gmail.com), pestañas `Solicitudes` y `Resumen` |
