@@ -4,7 +4,7 @@ from html import escape
 
 BASE = "https://founder.airesolutionlabs.com"
 OUT = Path(__file__).parent / "web"
-V = "1"  # sube este número si cambias formularios.css o formularios.js
+V = "3"  # sube este número si cambias formularios.css o formularios.js
 
 SECTORES = ["Salud y bienestar", "Estética y belleza", "Abogacía y asesoría", "Inmobiliaria",
             "Hostelería y restauración", "Comercio", "Formación", "Deporte", "Reformas y construcción", "Otro"]
@@ -98,6 +98,15 @@ def texto(nombre, etiqueta, tipo="text", obligatorio=True, auto=None, extra="", 
 """
 
 
+# Campo que solo se muestra (y se exige) si el sector elegido es "Otro"; lo gestiona formularios.js
+SECTOR_OTRO = """            <div class="field" data-campo="sector_otro" hidden>
+                <label class="label" for="sector_otro">¿Cuál es tu sector?</label>
+                <input type="text" id="sector_otro" name="sector_otro" aria-describedby="sector_otro-error" aria-required="true" maxlength="60" placeholder="Ej.: fotografía, veterinaria, jardinería">
+                <p class="error" id="sector_otro-error"></p>
+            </div>
+"""
+
+
 def seleccion(nombre, etiqueta, opciones, vacio):
     ops = "\n".join(f'                    <option value="{escape(o)}">{escape(o)}</option>' for o in opciones)
     return f"""            <div class="field" data-campo="{nombre}">
@@ -177,7 +186,7 @@ def pagina_tarjeta():
         </div>
         <form data-formulario="tarjeta" novalidate>
             <div id="resumen-errores" class="summary" tabindex="-1" role="alert"></div>
-{texto("nombre", "Nombre y apellidos", auto="name", extra='maxlength="80"')}{texto("negocio", "Nombre de tu negocio", auto="organization", extra='maxlength="80"')}{texto("cargo", "Cargo o profesión", obligatorio=False, auto="organization-title", extra='maxlength="60"', placeholder="Ej.: fisioterapeuta, abogada, gerente")}{seleccion("sector", "Sector", SECTORES, "Elige tu sector")}{texto("whatsapp", "WhatsApp", tipo="tel", auto="tel", extra='inputmode="tel" maxlength="20"', placeholder="600 123 456", hint="Te escribiré aquí para terminar tu tarjeta.")}{texto("email", "Email", tipo="email", auto="email", extra='maxlength="254" autocapitalize="off" spellcheck="false"')}{texto("instagram", "Instagram del negocio", obligatorio=False, extra='maxlength="60" autocapitalize="off" spellcheck="false"', placeholder="@minegocio")}{texto("web", "Página web", tipo="url", obligatorio=False, auto="url", extra='inputmode="url" maxlength="200" autocapitalize="off" spellcheck="false"', placeholder="minegocio.es")}{grupo("botones", "¿Qué botones quieres en tu tarjeta?", BOTONES, hint="Elige al menos uno. Después podemos cambiarlos.", marcadas=("WhatsApp",), obligatorio=True)}{grupo("mejorar", "¿Qué más te gustaría mejorar en tu negocio?", MEJORAR)}{TRAMPA}{legal("preparar tu tarjeta y contactarte por WhatsApp o email para terminarla.")}{envio("Pedir mi tarjeta gratis", "amber")}        <section id="exito" class="success" aria-labelledby="exito-titulo">
+{texto("nombre", "Nombre y apellidos", auto="name", extra='maxlength="80"')}{texto("negocio", "Nombre de tu negocio", auto="organization", extra='maxlength="80"')}{texto("cargo", "Cargo o profesión", obligatorio=False, auto="organization-title", extra='maxlength="60"', placeholder="Ej.: fisioterapeuta, abogada, gerente")}{seleccion("sector", "Sector", SECTORES, "Elige tu sector")}{SECTOR_OTRO}{texto("whatsapp", "WhatsApp", tipo="tel", auto="tel", extra='inputmode="tel" maxlength="20"', placeholder="600 123 456", hint="Te escribiré aquí para terminar tu tarjeta.")}{texto("email", "Email", tipo="email", auto="email", extra='maxlength="254" autocapitalize="off" spellcheck="false"')}{texto("instagram", "Instagram del negocio", obligatorio=False, extra='maxlength="60" autocapitalize="off" spellcheck="false"', placeholder="@minegocio")}{texto("web", "Página web", tipo="url", obligatorio=False, auto="url", extra='inputmode="url" maxlength="200" autocapitalize="off" spellcheck="false"', placeholder="minegocio.es")}{grupo("botones", "¿Qué botones quieres en tu tarjeta?", BOTONES, hint="Elige al menos uno. Después podemos cambiarlos.", marcadas=("WhatsApp",), obligatorio=True)}{grupo("mejorar", "¿Qué más te gustaría mejorar en tu negocio?", MEJORAR)}{TRAMPA}{legal("preparar tu tarjeta y contactarte por WhatsApp o email para terminarla.")}{envio("Pedir mi tarjeta gratis", "amber")}        <section id="exito" class="success" aria-labelledby="exito-titulo">
             <div class="success-icon">{ICON_OK}</div>
             <h2 id="exito-titulo">Recibido, <span data-nombre></span></h2>
             <p>Te escribo por WhatsApp en las próximas 48 horas para pedirte la foto o el logo y terminar tu tarjeta.
@@ -198,7 +207,7 @@ def pagina_automatiza():
         </div>
         <form data-formulario="automatiza" novalidate>
             <div id="resumen-errores" class="summary" tabindex="-1" role="alert"></div>
-{texto("nombre", "Nombre y apellidos", auto="name", extra='maxlength="80"')}{texto("empresa", "Empresa", auto="organization", extra='maxlength="80"')}{seleccion("sector", "Sector", SECTORES, "Elige tu sector")}{texto("email", "Email", tipo="email", auto="email", extra='maxlength="254" autocapitalize="off" spellcheck="false"')}{texto("whatsapp", "Teléfono o WhatsApp", tipo="tel", obligatorio=False, auto="tel", extra='inputmode="tel" maxlength="20"', placeholder="600 123 456")}{seleccion("tamano", "¿Cuántas personas sois?", TAMANO, "Elige una opción")}{grupo("que", "¿Qué te gustaría automatizar?", QUE, hint="Puedes elegir varias.", obligatorio=True)}            <div class="field" data-campo="descripcion">
+{texto("nombre", "Nombre y apellidos", auto="name", extra='maxlength="80"')}{texto("empresa", "Empresa", auto="organization", extra='maxlength="80"')}{seleccion("sector", "Sector", SECTORES, "Elige tu sector")}{SECTOR_OTRO}{texto("email", "Email", tipo="email", auto="email", extra='maxlength="254" autocapitalize="off" spellcheck="false"')}{texto("whatsapp", "Teléfono o WhatsApp", tipo="tel", obligatorio=False, auto="tel", extra='inputmode="tel" maxlength="20"', placeholder="600 123 456")}{seleccion("tamano", "¿Cuántas personas sois?", TAMANO, "Elige una opción")}{grupo("que", "¿Qué te gustaría automatizar?", QUE, hint="Puedes elegir varias.", obligatorio=True)}            <div class="field" data-campo="descripcion">
                 <label class="label" for="descripcion">Cuéntame un poco más <span class="optional">(opcional)</span></label>
                 <p class="hint" id="descripcion-hint">Qué tarea te quita más tiempo y qué herramientas usáis (WhatsApp, Gmail, Excel, un programa de gestión…).</p>
                 <textarea id="descripcion" name="descripcion" maxlength="1000" aria-describedby="descripcion-hint descripcion-contador descripcion-error"></textarea>

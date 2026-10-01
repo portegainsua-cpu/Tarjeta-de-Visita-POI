@@ -8,6 +8,7 @@ Actualizado: 25/09/2026. Sustituye a `docs/brief-formularios.md` (propuesta inic
 |---|---|
 | Formulario "Tu tarjeta digital gratis" | `tarjeta/index.html` → https://founder.airesolutionlabs.com/tarjeta/ |
 | Formulario "Automatiza tu negocio" | `automatiza/index.html` → https://founder.airesolutionlabs.com/automatiza/ |
+| Formulario de contacto de la web | En www.airesolutionlabs.com (otro repo). Envía `formulario: "contacto"` con `nombre`, `email` y `mensaje` (10-2000 caracteres); se guarda en `Solicitudes` con Formulario = "Contacto" y el mensaje en la columna "Descripción" |
 | Política de privacidad | `privacidad/index.html` |
 | Estilos y lógica comunes | `assets/formularios.css`, `assets/formularios.js` |
 | Hoja de solicitudes | Google Sheets "Solicitudes AI Resolution Labs" (Drive de portegainsprofesional@gmail.com), pestañas `Solicitudes` y `Resumen` |
@@ -51,6 +52,7 @@ Pruebas automáticas del script (con servicios de Google simulados): `node test.
 - Textos de los formularios: `tarjeta/index.html` y `automatiza/index.html`.
 - Si cambias `assets/formularios.css` o `assets/formularios.js`, sube el `?v=` en las tres páginas que los cargan.
 - Opciones de los desplegables y casillas: están en el HTML **y** en `OPCIONES` de `Code.gs`. Tienen que coincidir o el servidor rechazará el envío.
+- Sector "Otro": al elegirlo aparece "¿Cuál es tu sector?" (campo `sector_otro`, obligatorio, de 2 a 60 caracteres). En la hoja se guarda en la columna Sector como `Otro: <lo que escriba>`.
 
 ## Límites que conviene conocer
 

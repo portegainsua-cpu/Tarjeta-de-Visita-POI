@@ -30,6 +30,7 @@
             negocio: { obligatorio: true, min: 2, max: 80, msg: 'Escribe el nombre de tu negocio.' },
             cargo: { max: 60, msg: 'Máximo 60 caracteres.' },
             sector: { obligatorio: true, msg: 'Elige un sector.' },
+            sector_otro: { obligatorio: true, min: 2, max: 60, soloSiOtro: true, msg: 'Escribe tu sector (mínimo 2 letras).' },
             whatsapp: { obligatorio: true, tipo: 'tel', msg: 'Escribe un número de WhatsApp válido, por ejemplo 600 123 456.' },
             email: { obligatorio: true, tipo: 'email', msg: 'Escribe un email válido.' },
             instagram: { tipo: 'instagram', msg: 'Escribe tu usuario de Instagram, por ejemplo @minegocio.' },
@@ -41,6 +42,7 @@
             nombre: { obligatorio: true, min: 2, max: 80, msg: 'Escribe tu nombre (mínimo 2 letras).' },
             empresa: { obligatorio: true, min: 2, max: 80, msg: 'Escribe el nombre de tu empresa.' },
             sector: { obligatorio: true, msg: 'Elige un sector.' },
+            sector_otro: { obligatorio: true, min: 2, max: 60, soloSiOtro: true, msg: 'Escribe tu sector (mínimo 2 letras).' },
             email: { obligatorio: true, tipo: 'email', msg: 'Escribe un email válido.' },
             whatsapp: { tipo: 'tel', msg: 'Escribe un teléfono válido, por ejemplo 600 123 456.' },
             tamano: { obligatorio: true, msg: 'Elige el tamaño de tu equipo.' },
@@ -61,6 +63,7 @@
         var r = REGLAS[nombre];
         if (r && r.grupo) return $all('input[name="' + nombre + '"]:checked', form).map(function (i) { return i.value; });
         if (r && r.radio) { var c = $('input[name="' + nombre + '"]:checked', form); return c ? c.value : ''; }
+        if (r && r.soloSiOtro && valorCampo('sector') !== 'Otro') return '';
         var el = form.elements[nombre];
         return el ? limpiar(el.value) : '';
     }
@@ -86,6 +89,7 @@
     function error(nombre) {
         var r = REGLAS[nombre];
         if (!r) return '';
+        if (r.soloSiOtro && valorCampo('sector') !== 'Otro') return '';
         var v = valorCampo(nombre);
         if (r.grupo) return v.length < (r.min || 0) ? r.msg : '';
         if (!v) {
@@ -135,6 +139,17 @@
             el.addEventListener('input', function () { if (tocados[nombre]) marcar(nombre, error(nombre)); });
         });
     });
+
+    // "¿Cuál es tu sector?" solo aparece (y es obligatorio) si se elige "Otro"
+    function actualizarSectorOtro() {
+        var cont = contenedor('sector_otro');
+        if (!cont) return;
+        var mostrar = valorCampo('sector') === 'Otro';
+        cont.hidden = !mostrar;
+        if (!mostrar) { tocados.sector_otro = false; marcar('sector_otro', ''); }
+    }
+    if (form.elements.sector) form.elements.sector.addEventListener('change', actualizarSectorOtro);
+    actualizarSectorOtro();
 
     // Contador de caracteres
     $all('textarea[maxlength]', form).forEach(function (ta) {

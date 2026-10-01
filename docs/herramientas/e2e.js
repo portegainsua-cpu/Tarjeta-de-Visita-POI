@@ -137,11 +137,35 @@ async function registro() {
   await fetch('http://localhost:8081/forzar');
   ok('error interno: muestra el email como alternativa');
 
+  // 7b. Sector "Otro": aparece "¿Cuál es tu sector?", es obligatorio y se guarda
+  await page.goto(BASE + '/tarjeta/' + Q);
+  assert.strictEqual(await page.isHidden('#sector_otro'), true);
+  await page.selectOption('#sector', 'Otro');
+  assert.strictEqual(await page.isVisible('#sector_otro'), true);
+  await page.fill('#nombre', 'Ana Gil'); await page.fill('#negocio', 'Estudio Ana');
+  await page.fill('#whatsapp', '622333444'); await page.fill('#email', 'ana@ejemplo.com'); await page.check('#privacidad');
+  await page.click('button[type=submit]');
+  await page.waitForSelector('#resumen-errores.visible');
+  assert.ok((await page.textContent('#resumen-errores')).includes('Escribe tu sector'));
+  assert.strictEqual(await page.getAttribute('#sector_otro', 'aria-invalid'), 'true');
+  await page.screenshot({ path: 'capturas/7b-sector-otro.png', fullPage: true });
+  await page.selectOption('#sector', 'Comercio');
+  assert.strictEqual(await page.isHidden('#sector_otro'), true);
+  await page.selectOption('#sector', 'Otro');
+  await page.fill('#sector_otro', 'Fotografía de bodas');
+  await page.waitForTimeout(3100);
+  await page.click('button[type=submit]');
+  await page.waitForSelector('#exito.visible', { timeout: 10000 });
+  reg = await registro();
+  const filaOtro = Object.fromEntries(reg.cabeceras.map((h, i) => [h, reg.filas[reg.filas.length - 1][i]]));
+  assert.strictEqual(filaOtro['Sector'], 'Otro: Fotografía de bodas');
+  ok('sector "Otro": pide cuál, lo exige y lo guarda como "Otro: …"');
+
   // 8. Turnstile bloqueado → alternativa
   turnstileRoto = true;
   await page.goto(BASE + '/tarjeta/' + Q);
   await page.fill('#nombre', 'Luis'); await page.fill('#negocio', 'Taller Luis');
-  await page.selectOption('#sector', 'Otro'); await page.fill('#whatsapp', '611222333');
+  await page.selectOption('#sector', 'Otro'); await page.fill('#sector_otro', 'Taller mecánico'); await page.fill('#whatsapp', '611222333');
   await page.fill('#email', 'luis@ejemplo.com'); await page.check('#privacidad');
   await page.click('button[type=submit]');
   await page.waitForSelector('#alternativa.visible', { timeout: 15000 });
