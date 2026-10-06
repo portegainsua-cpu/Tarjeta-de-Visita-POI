@@ -25,10 +25,17 @@ Repo: https://github.com/portegainsua-cpu/Tarjeta-de-Visita-POI
   Turnstile. Detalles, URLs y cómo desplegar: `docs/formularios.md`.
 - Nunca poner en el repo la clave secreta de Turnstile ni otros secretos: van en
   las propiedades del Apps Script.
-- Datos del script en el objeto `CONFIG` (inicio del `<script>`); colores en
-  variables de `:root` (inicio del `<style>`). No añadir colores sueltos.
-- Fuente Outfit local en `fonts/` (woff2, font-display: swap). Sin dependencias externas.
-- Iconos SVG inline con `aria-hidden="true"`.
+- Diseño de la marca AIR (variante E): fondo celeste, cabecera azul noche, bloques
+  blancos, paleta cobalto y naranja, textos en "usted" y primera persona.
+- Datos del script en el objeto `CONFIG` (inicio del `<script>`, incluye las frases);
+  colores en variables `--color-*` de `:root` (inicio del `<style>` y de
+  `assets/formularios.css`, que deben coincidir). No añadir colores sueltos.
+- Fuente Manrope variable local en `fonts/` (woff2, font-display: swap, preload).
+  Sin dependencias externas ni peticiones a terceros (salvo Turnstile en los formularios).
+- Iconos SVG inline de la familia Lucide (trazo 1,5) con `aria-hidden="true"`.
+- En los formularios no se cambian los `name` de los campos ni el texto de las opciones:
+  tienen que coincidir con `OPCIONES` de `docs/apps-script/Code.gs`.
+- `docs/herramientas/generar_paginas.py`: OBSOLETO desde el rediseño AIR (06/10/2026): genera el diseño antiguo, no usar.
 - PWA: `manifest.webmanifest` + `sw.js` (HTML network-first, estáticos
   cache-first, caché versionada con `CACHE_VERSION`). Si se cambia un recurso
   estático sin renombrarlo, subir `CACHE_VERSION`; si se añade uno, incluirlo

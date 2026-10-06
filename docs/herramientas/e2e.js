@@ -34,11 +34,32 @@ async function registro() {
 
   // 1. La tarjeta enlaza a las páginas nuevas
   await page.goto(BASE + '/');
-  assert.strictEqual(await page.getAttribute('a.featured-item >> nth=0', 'href'), 'automatiza/');
-  assert.strictEqual(await page.getAttribute('a.amber-item', 'href'), 'tarjeta/');
+  assert.strictEqual(await page.getAttribute('a.fila >> nth=0', 'href'), 'automatiza/');
+  assert.strictEqual(await page.getAttribute('a.gratis', 'href'), 'tarjeta/');
   assert.strictEqual(await page.locator('a[href*="docs.google.com"]').count(), 0);
   await page.screenshot({ path: 'capturas/1-tarjeta.png', fullPage: true });
   ok('la tarjeta apunta a /tarjeta/ y /automatiza/');
+
+  // 1b. Interacciones de la tarjeta (marca AIR)
+  assert.strictEqual(await page.isHidden('#nota-air'), true);
+  await page.click('#boton-air');
+  assert.strictEqual(await page.getAttribute('#boton-air', 'aria-expanded'), 'true');
+  assert.strictEqual(await page.isVisible('#nota-air'), true);
+  await page.click('#boton-air');
+  assert.strictEqual(await page.isHidden('#nota-air'), true);
+  await page.click('#foto');
+  assert.strictEqual(await page.getAttribute('#foto', 'aria-pressed'), 'true');
+  await page.click('#foto');
+  assert.strictEqual(await page.getAttribute('#foto', 'aria-pressed'), 'false');
+  const frase1 = await page.textContent('#frase');
+  await page.click('#frase');
+  const frase2 = await page.textContent('#frase');
+  assert.notStrictEqual(frase1, frase2);
+  assert.strictEqual(await page.getAttribute('#frase', 'aria-label'), frase2 + ' (pulse para ver otra frase)');
+  assert.strictEqual(await page.isHidden('#aviso'), true);
+  await page.click('#guardar');
+  assert.ok((await page.textContent('#aviso')).includes('Contacto listo. Ábralo para guardarlo en su agenda.'));
+  ok('tarjeta: nota AIR, giro de la foto, frases y aviso de contacto');
 
   // 2. Tarjeta: enviar vacío muestra errores
   await page.goto(BASE + '/tarjeta/' + Q + '&ref=irene-ortega');
@@ -146,7 +167,7 @@ async function registro() {
   await page.fill('#whatsapp', '622333444'); await page.fill('#email', 'ana@ejemplo.com'); await page.check('#privacidad');
   await page.click('button[type=submit]');
   await page.waitForSelector('#resumen-errores.visible');
-  assert.ok((await page.textContent('#resumen-errores')).includes('Escribe tu sector'));
+  assert.ok((await page.textContent('#resumen-errores')).includes('Escriba su sector'));
   assert.strictEqual(await page.getAttribute('#sector_otro', 'aria-invalid'), 'true');
   await page.screenshot({ path: 'capturas/7b-sector-otro.png', fullPage: true });
   await page.selectOption('#sector', 'Comercio');

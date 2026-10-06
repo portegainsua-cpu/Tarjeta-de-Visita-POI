@@ -3,45 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuéntame qué quieres automatizar | AI Resolution Labs</title>
-    <meta name="description" content="Cuéntame qué tareas te quitan tiempo en tu negocio y te propongo cómo automatizarlas con IA y herramientas No-Code.">
+    <title>Cuénteme qué quiere automatizar | AI Resolution Labs</title>
+    <meta name="description" content="Cuénteme qué tareas le quitan tiempo y le digo qué se puede automatizar en su negocio. Respuesta en un máximo de 72 horas.">
     <link rel="canonical" href="https://founder.airesolutionlabs.com/automatiza/">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://founder.airesolutionlabs.com/automatiza/">
     <meta property="og:site_name" content="AI Resolution Labs">
     <meta property="og:locale" content="es_ES">
-    <meta property="og:title" content="Cuéntame qué quieres automatizar | AI Resolution Labs">
-    <meta property="og:description" content="Cuéntame qué tareas te quitan tiempo en tu negocio y te propongo cómo automatizarlas con IA y herramientas No-Code.">
+    <meta property="og:title" content="Cuénteme qué quiere automatizar | AI Resolution Labs">
+    <meta property="og:description" content="Cuénteme qué tareas le quitan tiempo y le digo qué se puede automatizar en su negocio. Respuesta en un máximo de 72 horas.">
     <meta property="og:image" content="https://founder.airesolutionlabs.com/img/og-image.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Cuéntame qué quieres automatizar | AI Resolution Labs">
-    <meta name="twitter:description" content="Cuéntame qué tareas te quitan tiempo en tu negocio y te propongo cómo automatizarlas con IA y herramientas No-Code.">
+    <meta name="twitter:title" content="Cuénteme qué quiere automatizar | AI Resolution Labs">
+    <meta name="twitter:description" content="Cuénteme qué tareas le quitan tiempo y le digo qué se puede automatizar en su negocio. Respuesta en un máximo de 72 horas.">
     <meta name="twitter:image" content="https://founder.airesolutionlabs.com/img/og-image.jpg">
-    <link rel="icon" type="image/png" sizes="32x32" href="../img/favicon-32.png">
+    <link rel="icon" href="../img/favicon.ico" sizes="32x32">
+    <link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
-    <meta name="theme-color" content="#030712">
-    <link rel="preload" href="../fonts/outfit-400.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="../fonts/outfit-600.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="../assets/formularios.css?v=3">
-    <script src="../assets/formularios.js?v=3" defer></script>
+    <meta name="theme-color" content="#0A1022">
+    <link rel="preload" href="../fonts/manrope-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="../assets/formularios.css?v=4">
+    <script src="../assets/formularios.js?v=4" defer></script>
 </head>
 <body>
-    <main class="card">
-        <a class="back" href="../"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Volver a la tarjeta</a>
-        <div id="intro">
-            <div class="author">
-                <img src="../img/perfil-240.webp" width="44" height="44" alt="">
-                <div>
-                    <div class="author-name">Pablo Ortega Insúa</div>
-                    <div class="author-role">AI Resolution Labs</div>
-                </div>
+    <div class="pagina">
+        <header class="cabecera oscuro">
+            <div class="cabecera-fila">
+                <a class="volver" href="../"><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Volver a la tarjeta</a>
+                <span class="marca"><svg class="logo-air" width="24" height="24" viewBox="0 0 32 32" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="logo-letras" d="M3.8 23 L8.8 9 L13.8 23"/><path class="logo-letras" d="M17.6 9 V23"/><path class="logo-erre" d="M21.4 23 V9 H24.4 A3.5 3.5 0 0 1 24.4 16 H21.4 M24.2 16 L28.2 23"/></svg>AI Resolution Labs</span>
             </div>
-            <span class="badge blue">Automatiza tu negocio</span>
-            <h1>Cuéntame qué quieres automatizar</h1>
-            <p class="lead">Con esto preparo la primera conversación. Te respondo yo, sin compromiso.</p>
-        </div>
+            <div class="intro" id="intro">
+                <span class="badge cobalto">Automatice su negocio</span>
+                <h1>Cuénteme qué quiere automatizar</h1>
+                <p class="lead">Con esto preparo la primera conversación. Le respondo yo, sin compromiso.</p>
+            </div>
+        </header>
+    <main class="card">
         <form data-formulario="automatiza" novalidate>
             <div id="resumen-errores" class="summary" tabindex="-1" role="alert"></div>
             <div class="field" data-campo="nombre">
@@ -57,7 +56,7 @@
             <div class="field" data-campo="sector">
                 <label class="label" for="sector">Sector</label>
                 <select id="sector" name="sector" aria-describedby="sector-error" aria-required="true">
-                    <option value="">Elige tu sector</option>
+                    <option value="">Elija su sector</option>
                     <option value="Salud y bienestar">Salud y bienestar</option>
                     <option value="Estética y belleza">Estética y belleza</option>
                     <option value="Abogacía y asesoría">Abogacía y asesoría</option>
@@ -72,7 +71,7 @@
                 <p class="error" id="sector-error"></p>
             </div>
             <div class="field" data-campo="sector_otro" hidden>
-                <label class="label" for="sector_otro">¿Cuál es tu sector?</label>
+                <label class="label" for="sector_otro">¿Cuál es su sector?</label>
                 <input type="text" id="sector_otro" name="sector_otro" aria-describedby="sector_otro-error" aria-required="true" maxlength="60" placeholder="Ej.: fotografía, veterinaria, jardinería">
                 <p class="error" id="sector_otro-error"></p>
             </div>
@@ -87,9 +86,9 @@
                 <p class="error" id="whatsapp-error"></p>
             </div>
             <div class="field" data-campo="tamano">
-                <label class="label" for="tamano">¿Cuántas personas sois?</label>
+                <label class="label" for="tamano">¿Cuántas personas son?</label>
                 <select id="tamano" name="tamano" aria-describedby="tamano-error" aria-required="true">
-                    <option value="">Elige una opción</option>
+                    <option value="">Elija una opción</option>
                     <option value="Solo yo">Solo yo</option>
                     <option value="2–5 personas">2–5 personas</option>
                     <option value="6–20">6–20</option>
@@ -98,8 +97,8 @@
                 <p class="error" id="tamano-error"></p>
             </div>
             <fieldset class="field" data-campo="que" aria-describedby="que-hint que-error">
-                <legend class="label">¿Qué te gustaría automatizar?</legend>
-                <p class="hint" id="que-hint">Puedes elegir varias.</p>
+                <legend class="label">¿Qué le gustaría automatizar?</legend>
+                <p class="hint" id="que-hint">Puede elegir varias.</p>
                 <div class="chips">
                     <label class="chip"><input type="checkbox" id="que-1" name="que" value="Citas y reservas"><span>Citas y reservas</span></label>
                     <label class="chip"><input type="checkbox" id="que-2" name="que" value="Atención por WhatsApp o Instagram"><span>Atención por WhatsApp o Instagram</span></label>
@@ -111,14 +110,14 @@
                 <p class="error" id="que-error"></p>
             </fieldset>
             <div class="field" data-campo="descripcion">
-                <label class="label" for="descripcion">Cuéntame un poco más <span class="optional">(opcional)</span></label>
-                <p class="hint" id="descripcion-hint">Qué tarea te quita más tiempo y qué herramientas usáis (WhatsApp, Gmail, Excel, un programa de gestión…).</p>
+                <label class="label" for="descripcion">Cuénteme un poco más <span class="optional">(opcional)</span></label>
+                <p class="hint" id="descripcion-hint">Qué tarea le quita más tiempo y qué herramientas usan (WhatsApp, Gmail, Excel, un programa de gestión…).</p>
                 <textarea id="descripcion" name="descripcion" maxlength="1000" aria-describedby="descripcion-hint descripcion-contador descripcion-error"></textarea>
                 <p class="counter" id="descripcion-contador" aria-live="off"></p>
                 <p class="error" id="descripcion-error"></p>
             </div>
             <fieldset class="field" data-campo="contacto" aria-describedby="contacto-error">
-                <legend class="label">¿Cómo prefieres que te contacte?</legend>
+                <legend class="label">¿Cómo prefiere que le contacte?</legend>
                 <div class="chips">
                     <label class="chip"><input type="radio" id="contacto-1" name="contacto" value="Email" checked><span>Email</span></label>
                     <label class="chip"><input type="radio" id="contacto-2" name="contacto" value="WhatsApp"><span>WhatsApp</span></label>
@@ -127,13 +126,13 @@
                 <p class="error" id="contacto-error"></p>
             </fieldset>
             <div class="hp" aria-hidden="true">
-                <label for="web_empresa">No rellenes este campo</label>
+                <label for="web_empresa">No rellene este campo</label>
                 <input type="text" id="web_empresa" name="web_empresa" tabindex="-1" autocomplete="off">
             </div>
             <div class="legal">
                 <strong>Responsable:</strong> Pablo Ortega Insúa (AI Resolution Labs).
-                <strong>Finalidad:</strong> responder a tu consulta y, si lo pides, prepararte una propuesta.
-                <strong>Legitimación:</strong> tu propia solicitud y, si marcas la casilla de ofertas, tu consentimiento.
+                <strong>Finalidad:</strong> responder a su consulta y, si lo pide, prepararle una propuesta.
+                <strong>Legitimación:</strong> su propia solicitud y, si marca la casilla de ofertas, su consentimiento.
                 <strong>Destinatarios:</strong> Google y Cloudflare, que tratan los datos por encargo; no se ceden a nadie más.
                 <strong>Derechos:</strong> acceso, rectificación, supresión y los demás que reconoce el RGPD, en
                 <a href="mailto:info@airesolutionlabs.com">info@airesolutionlabs.com</a>.
@@ -148,18 +147,19 @@
                 <span>Quiero recibir novedades y ofertas de AI Resolution Labs (opcional).</span>
             </label>
             <div id="turnstile" class="ts"></div>
-            <button type="submit" class="submit ">Enviar consulta</button>
+            <button type="submit" class="submit">Enviar consulta</button>
             <p id="estado" class="status" role="status" aria-live="polite"></p>
             <div id="alternativa" class="fallback" role="alert"></div>
         </form>
         <section id="exito" class="success" aria-labelledby="exito-titulo">
             <div class="success-icon"><svg aria-hidden="true" focusable="false" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
             <h2 id="exito-titulo">Recibido, <span data-nombre></span></h2>
-            <p>Te respondo en las próximas 48 horas. Si quieres adelantarlo, reserva una videollamada conmigo:</p>
+            <p>Le responderé lo antes posible, como máximo en 72 horas. Si quiere adelantarlo, reserve una videollamada conmigo:</p>
             <a class="button-link" href="https://cal.com/pablo-ortega-insua-wdoysa" target="_blank" rel="noopener noreferrer">Reservar videollamada<span class="sr-only">(se abre en una pestaña nueva)</span></a>
             <br>
             <a class="link-muted" href="../">Volver a la tarjeta</a>
         </section>
     </main>
+    </div>
 </body>
 </html>

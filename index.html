@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pablo Ortega Insúa | Especialista en IA y Automatización No-Code</title>
-    
-    <!-- Meta tags SEO y Optimización -->
-    <meta name="description" content="Ayudo a empresas a optimizar tiempo y reducir costes diseñando ecosistemas inteligentes y automatizaciones eficientes No-Code.">
+    <title>Pablo Ortega Insúa · Consultor de tecnología e IA | AI Resolution Labs</title>
+
+    <!-- SEO -->
+    <meta name="description" content="Consultor de tecnología e IA · Fundador de AI Resolution Labs. Lo pruebo, se lo dejo funcionando y le enseño a usarlo, sin tecnicismos.">
     <link rel="canonical" href="https://founder.airesolutionlabs.com/">
 
     <!-- Vista previa al compartir (Open Graph y X/Twitter). Las URL deben ser absolutas. -->
@@ -14,8 +14,8 @@
     <meta property="og:url" content="https://founder.airesolutionlabs.com/">
     <meta property="og:site_name" content="AI Resolution Labs">
     <meta property="og:locale" content="es_ES">
-    <meta property="og:title" content="Pablo Ortega Insúa | Especialista en IA y Automatización">
-    <meta property="og:description" content="Ayudo a empresas a optimizar tiempo y reducir costes diseñando ecosistemas inteligentes y automatizaciones eficientes.">
+    <meta property="og:title" content="Pablo Ortega Insúa · Consultor de tecnología e IA">
+    <meta property="og:description" content="Lo pruebo, se lo dejo funcionando y le enseño a usarlo, sin tecnicismos.">
     <meta property="og:image" content="https://founder.airesolutionlabs.com/img/og-image.jpg">
     <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="1200">
@@ -24,8 +24,8 @@
     <meta property="profile:first_name" content="Pablo">
     <meta property="profile:last_name" content="Ortega Insúa">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Pablo Ortega Insúa | Especialista en IA y Automatización">
-    <meta name="twitter:description" content="Ayudo a empresas a optimizar tiempo y reducir costes diseñando ecosistemas inteligentes y automatizaciones eficientes.">
+    <meta name="twitter:title" content="Pablo Ortega Insúa · Consultor de tecnología e IA">
+    <meta name="twitter:description" content="Lo pruebo, se lo dejo funcionando y le enseño a usarlo, sin tecnicismos.">
     <meta name="twitter:image" content="https://founder.airesolutionlabs.com/img/og-image.jpg">
     <meta name="twitter:image:alt" content="Pablo Ortega Insúa, especialista en IA y automatización No-Code">
 
@@ -35,7 +35,7 @@
         "@context": "https://schema.org",
         "@type": "Person",
         "name": "Pablo Ortega Insúa",
-        "jobTitle": "Especialista en IA y Automatización No-Code",
+        "jobTitle": "Consultor de tecnología e IA",
         "worksFor": { "@type": "Organization", "name": "AI Resolution Labs", "url": "https://www.airesolutionlabs.com/" },
         "url": "https://founder.airesolutionlabs.com/",
         "image": "https://founder.airesolutionlabs.com/img/perfil-480.webp",
@@ -44,496 +44,84 @@
     }
     </script>
 
-    <!-- Iconos y app instalable (PWA) -->
-    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+    <!-- Iconos AIR y app instalable (PWA) -->
+    <link rel="icon" href="img/favicon.ico" sizes="32x32">
+    <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
     <link rel="manifest" href="manifest.webmanifest">
-    <meta name="theme-color" content="#030712">
+    <meta name="theme-color" content="#0A1022">
     <meta name="apple-mobile-web-app-title" content="Pablo Ortega">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="mobile-web-app-capable" content="yes">
-    
-    <!-- Fuente Outfit alojada en el repo (fonts/, licencia OFL). Se precargan los pesos del texto principal. -->
-    <link rel="preload" href="fonts/outfit-400.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="fonts/outfit-600.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="fonts/outfit-700.woff2" as="font" type="font/woff2" crossorigin>
+
+    <!-- Fuente Manrope variable alojada en el repo (fonts/, licencia OFL) -->
+    <link rel="preload" href="fonts/manrope-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 
     <style>
         @font-face {
-            font-family: 'Outfit';
+            font-family: 'Manrope';
             font-style: normal;
-            font-weight: 400;
+            font-weight: 200 800;
             font-display: swap;
-            src: url(fonts/outfit-400.woff2) format('woff2');
+            src: url(fonts/manrope-latin-wght-normal.woff2) format('woff2');
         }
 
-        @font-face {
-            font-family: 'Outfit';
-            font-style: normal;
-            font-weight: 500;
-            font-display: swap;
-            src: url(fonts/outfit-500.woff2) format('woff2');
-        }
-
-        @font-face {
-            font-family: 'Outfit';
-            font-style: normal;
-            font-weight: 600;
-            font-display: swap;
-            src: url(fonts/outfit-600.woff2) format('woff2');
-        }
-
-        @font-face {
-            font-family: 'Outfit';
-            font-style: normal;
-            font-weight: 700;
-            font-display: swap;
-            src: url(fonts/outfit-700.woff2) format('woff2');
-        }
-
-        /* Paleta: cambia aquí los colores de la tarjeta.
-           Los *-rgb son los mismos colores en canales R, G, B para usarlos con transparencia: rgba(var(--primary-rgb), 0.2) */
+        /* Paleta de la marca AIR: cambie aquí los colores de la tarjeta */
         :root {
-            --primary-rgb: 59, 130, 246;
-            --secondary-rgb: 139, 92, 246;
-            --accent-rgb: 236, 72, 153;
-            --amber-rgb: 245, 158, 11;
-            --surface-rgb: 15, 23, 42;
-            --white-rgb: 255, 255, 255;
-            --shadow-rgb: 0, 0, 0;
-
-            --primary-glow: rgb(var(--primary-rgb));
-            --secondary-glow: rgb(var(--secondary-rgb));
-            --accent-glow: rgb(var(--accent-rgb));
-            --primary-light: #60a5fa;
-            --primary-lighter: #93c5fd;
-            --amber-light: #fcd34d;
-            --success: #10b981;
-            --focus-ring: #fcd34d;
-
-            --bg-color: #030712;
-            --bg-color-end: #080c18;
-            --profile-ring: #080d19;
-            --profile-bg: #0d1527;
-            --card-bg: rgba(var(--surface-rgb), 0.45);
-            --card-border: rgba(var(--white-rgb), 0.08);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --btn-bg: rgba(var(--white-rgb), 0.03);
-            --btn-border: rgba(var(--white-rgb), 0.06);
-            --btn-hover-bg: rgba(var(--white-rgb), 0.08);
+            --color-noche: #0A1022;
+            --color-celeste: #E0ECFF;
+            --color-blanco: #FFFFFF;
+            --color-claro: #FAFAFA;
+            --color-texto: #111827;
+            --color-texto-suave: #4B5563;
+            --color-gris-noche: #94A3B8;
+            --color-borde-noche: #26324A;
+            --color-cobalto: #2347C5;
+            --color-cobalto-oscuro: #1B379C;
+            --color-cobalto-claro: #EEF2FD;
+            --color-naranja: #FF8A4C;
+            --color-naranja-oscuro: #C2410C;
+            --color-separador: #E2E7EF;
         }
 
-        * {
+        *,
+        *::before,
+        *::after {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        }
+
+        /* "hidden" siempre oculta, aunque el elemento tenga display propio */
+        [hidden] {
+            display: none !important;
         }
 
         body {
-            font-family: 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
-            background-color: var(--bg-color);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(var(--primary-rgb), 0.15) 0, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(var(--secondary-rgb), 0.12) 0, transparent 50%),
-                linear-gradient(to bottom, var(--bg-color), var(--bg-color-end));
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 30px 20px;
-            overflow-x: hidden;
-            position: relative;
+            margin: 0;
+            background: var(--color-celeste);
+            color: var(--color-texto);
+            font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Cuadrícula de fondo tecnológica */
-        .bg-grid {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(var(--white-rgb), 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(var(--white-rgb), 0.02) 1px, transparent 1px);
-            background-size: 40px 40px;
-            background-position: center;
-            z-index: -2;
-            opacity: 0.7;
+        a {
+            color: var(--color-cobalto);
         }
 
-        /* Resplandor dinámico del cursor */
-        #mouse-glow {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(var(--primary-rgb), 0.12) 0%, rgba(var(--secondary-rgb), 0.05) 50%, transparent 80%);
-            border-radius: 50%;
-            /* El script mueve el resplandor con transform (no provoca recálculo de maquetación) */
-            transform: translate(var(--glow-x, 50vw), var(--glow-y, 50vh)) translate(-50%, -50%);
-            pointer-events: none;
-            z-index: -1;
+        a:hover {
+            color: var(--color-cobalto-oscuro);
         }
 
-        @media (max-width: 640px) {
-            #mouse-glow {
-                position: absolute;
-                width: 300px;
-                height: 300px;
-                left: 50%;
-                top: 30%;
-                background: radial-gradient(circle, rgba(var(--primary-rgb), 0.15) 0%, rgba(var(--secondary-rgb), 0.06) 60%, transparent 100%);
-                transform: translate(-50%, -50%);
-            }
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid var(--color-cobalto);
+            outline-offset: 2px;
         }
 
-        /* Contenedor Principal (Glassmorphism) */
-        /* En móvil el fondo es casi opaco y no se usa backdrop-filter (coste alto de GPU);
-           el desenfoque solo se aplica en pantallas grandes, más abajo. */
-        .card {
-            background: rgba(var(--surface-rgb), 0.82);
-            border: 1px solid var(--card-border);
-            border-radius: 28px;
-            padding: 40px 24px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 
-                0 25px 50px -12px rgba(var(--shadow-rgb), 0.5),
-                0 0 40px rgba(var(--primary-rgb), 0.05);
-            text-align: center;
-            position: relative;
-            z-index: 10;
+        .oscuro a:focus-visible,
+        .oscuro button:focus-visible {
+            outline-color: var(--color-naranja);
         }
 
-        @media (min-width: 641px) {
-            @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-                .card {
-                    background: var(--card-bg);
-                    backdrop-filter: blur(12px);
-                    -webkit-backdrop-filter: blur(12px);
-                }
-            }
-        }
-
-        /* Perfil y Efecto de Borde Degradado Animado */
-        .profile-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 24px auto;
-        }
-
-        .profile-glow {
-            position: absolute;
-            top: -4px;
-            left: -4px;
-            right: -4px;
-            bottom: -4px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-glow), var(--secondary-glow), var(--accent-glow));
-            z-index: 1;
-            /* Dos vueltas al cargar y se detiene (antes era infinita) */
-            animation: rotateGlow 8s linear 2;
-        }
-
-        .profile-img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid var(--profile-ring);
-            position: relative;
-            z-index: 2;
-            background-color: var(--profile-bg);
-        }
-
-        @keyframes rotateGlow {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Textos principales */
-        h1 {
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 8px;
-            letter-spacing: -0.02em;
-        }
-
-        /* Badge/Chapa de especialización */
-        .specialty-badge {
-            display: inline-flex;
-            align-items: center;
-            background: rgba(var(--primary-rgb), 0.08);
-            border: 1px solid rgba(var(--primary-rgb), 0.25);
-            color: var(--primary-light);
-            font-size: 13px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            padding: 6px 14px;
-            border-radius: 9999px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.1);
-        }
-
-        .description {
-            font-size: 15px;
-            line-height: 1.6;
-            color: var(--text-muted);
-            margin-bottom: 28px;
-            font-weight: 400;
-        }
-
-        /* Botones de Acción (Dashboard Cards) */
-        .actions-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .action-item {
-            display: flex;
-            align-items: center;
-            background: var(--btn-bg);
-            border: 1px solid var(--btn-border);
-            padding: 16px 18px;
-            border-radius: 16px;
-            text-decoration: none;
-            color: var(--text-main);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Efecto de destello de luz al pasar el cursor */
-        .action-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(var(--white-rgb), 0.05), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.6s ease;
-        }
-
-        .action-item:hover::before {
-            transform: translateX(100%);
-        }
-
-        .action-item:hover {
-            transform: translateY(-2px);
-            background: var(--btn-hover-bg);
-            border-color: rgba(var(--primary-rgb), 0.35);
-            box-shadow: 
-                0 10px 20px -8px rgba(var(--shadow-rgb), 0.3),
-                0 0 15px rgba(var(--primary-rgb), 0.08);
-        }
-
-        /* Icono izquierda */
-        .action-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
-            background: rgba(var(--primary-rgb), 0.1);
-            color: var(--primary-light);
-            margin-right: 16px;
-            flex-shrink: 0;
-            transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .action-item:hover .action-icon {
-            background: rgba(var(--primary-rgb), 0.2);
-            color: var(--primary-lighter);
-            transform: scale(1.05);
-        }
-
-        /* Contenido del texto del botón */
-        .action-content {
-            text-align: left;
-            flex-grow: 1;
-        }
-
-        .action-title {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .action-sub {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        /* Flecha indicadora derecha */
-        .action-arrow {
-            color: var(--text-muted);
-            opacity: 0.5;
-            transition: transform 0.3s ease, opacity 0.3s ease, color 0.3s ease;
-            display: flex;
-            align-items: center;
-        }
-
-        .action-item:hover .action-arrow {
-            opacity: 1;
-            transform: translateX(3px);
-            color: var(--primary-light);
-        }
-
-        /* Estilo especial destacado para los botones principales */
-        .featured-item {
-            background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.15) 0%, rgba(var(--secondary-rgb), 0.15) 100%);
-            border: 1px solid rgba(var(--primary-rgb), 0.3);
-        }
-
-        .featured-item .action-icon {
-            background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.2) 0%, rgba(var(--secondary-rgb), 0.2) 100%);
-            color: var(--primary-lighter);
-        }
-
-        .featured-item:hover {
-            border-color: rgba(var(--secondary-rgb), 0.6);
-            box-shadow: 
-                0 10px 20px -8px rgba(var(--secondary-rgb), 0.2),
-                0 0 20px rgba(var(--primary-rgb), 0.12);
-        }
-
-        /* Estilo especial destacado dorado para el CTA de la Tarjeta */
-        .amber-item {
-            background: linear-gradient(135deg, rgba(var(--amber-rgb), 0.12) 0%, rgba(var(--accent-rgb), 0.12) 100%);
-            border: 1px solid rgba(var(--amber-rgb), 0.25);
-        }
-
-        .amber-item .action-icon {
-            background: linear-gradient(135deg, rgba(var(--amber-rgb), 0.2) 0%, rgba(var(--accent-rgb), 0.2) 100%);
-            color: var(--amber-light);
-        }
-
-        .amber-item:hover {
-            border-color: rgba(var(--amber-rgb), 0.55);
-            box-shadow: 
-                0 10px 20px -8px rgba(var(--amber-rgb), 0.15),
-                0 0 20px rgba(var(--amber-rgb), 0.1);
-        }
-
-        /* Grid de botones de utilidades */
-        .utilities-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 24px;
-            border-top: 1px solid rgba(var(--white-rgb), 0.06);
-            padding-top: 20px;
-        }
-
-        .utility-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: rgba(var(--white-rgb), 0.02);
-            border: 1px solid rgba(var(--white-rgb), 0.05);
-            padding: 12px 14px;
-            border-radius: 12px;
-            color: var(--text-muted);
-            font-size: 13px;
-            font-weight: 500;
-            font-family: inherit;
-            cursor: pointer;
-            text-decoration: none;
-            transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-        }
-
-        .utility-btn:hover {
-            background: rgba(var(--white-rgb), 0.06);
-            border-color: rgba(var(--white-rgb), 0.15);
-            color: var(--text-main);
-            transform: translateY(-1px);
-        }
-
-        .utility-btn svg {
-            width: 16px;
-            height: 16px;
-            flex-shrink: 0;
-        }
-
-        /* Toast de notificación flotante */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translate(-50%, 100px);
-            background: rgba(var(--surface-rgb), 0.95);
-            border: 1px solid rgba(var(--primary-rgb), 0.3);
-            box-shadow: 0 10px 25px rgba(var(--shadow-rgb), 0.5), 0 0 15px rgba(var(--primary-rgb), 0.2);
-            color: var(--text-main);
-            padding: 12px 24px;
-            border-radius: 9999px;
-            font-size: 13px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none; /* no debe bloquear los botones que tapa */
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
-        }
-
-        .toast.show {
-            transform: translate(-50%, 0);
-            opacity: 1;
-        }
-
-        .toast-icon {
-            color: var(--success);
-            display: flex;
-            align-items: center;
-        }
-
-        /* Animaciones de Carga Escalónada (Staggered Fade-in) */
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-item {
-            opacity: 0;
-            transform: translateY(15px);
-            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        .delay-5 { animation-delay: 0.05s; }
-        .delay-6 { animation-delay: 0.1s; }
-        .delay-7 { animation-delay: 0.15s; }
-        .delay-8 { animation-delay: 0.2s; }
-        .delay-9 { animation-delay: 0.25s; }
-
-        /* Foco visible al navegar con teclado */
-        :focus-visible {
-            outline: 3px solid var(--focus-ring);
-            outline-offset: 3px;
-        }
-
-        .action-item:focus-visible,
-        .utility-btn:focus-visible {
-            border-color: var(--focus-ring);
-            background: var(--btn-hover-bg);
-        }
-
-        /* Texto solo para lectores de pantalla */
         .sr-only {
             position: absolute;
             width: 1px;
@@ -546,272 +134,713 @@
             border: 0;
         }
 
-        /* Movimiento reducido: sin giro, sin resplandor y sin animaciones de entrada */
-        @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                animation: none !important;
-                transition: none !important;
+        /* Columna de la tarjeta: 390 px en móvil, centrada en pantallas grandes */
+        .tarjeta {
+            max-width: 430px;
+            min-height: 100vh;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ---------- Cabecera azul noche ---------- */
+        .cabecera {
+            position: relative;
+            background: var(--color-noche);
+            color: var(--color-claro);
+            padding: 20px 24px 28px;
+            border-radius: 0 0 28px 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .marca {
+            align-self: stretch;
+            display: flex;
+            align-items: center;
+        }
+
+        .boton-air {
+            background: transparent;
+            border: 0;
+            padding: 4px;
+            margin: -4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-claro);
+            font: 600 15px 'Manrope', system-ui, sans-serif;
+            cursor: pointer;
+        }
+
+        /* Logo AIR: letras claras y la R en naranja */
+        .logo-air .logo-letras {
+            stroke: var(--color-claro);
+        }
+
+        .logo-air .logo-erre {
+            stroke: var(--color-naranja);
+        }
+
+        .logo-mini .logo-letras {
+            stroke: var(--color-blanco);
+        }
+
+        .nota-air {
+            align-self: stretch;
+            text-align: left;
+            margin: 12px 0 0;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--color-borde-noche);
+            font-size: 15px;
+            line-height: 1.45;
+            color: var(--color-gris-noche);
+        }
+
+        .nota-air strong {
+            color: var(--color-claro);
+            font-weight: 600;
+        }
+
+        /* Foto que gira y muestra el QR */
+        .foto {
+            position: relative;
+            margin-top: 28px;
+            width: 112px;
+            height: 112px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            perspective: 600px;
+        }
+
+        .giro {
+            position: absolute;
+            inset: 0;
+            display: block;
+            transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+            transition: transform 450ms ease-out;
+        }
+
+        .foto[aria-pressed="true"] .giro {
+            transform: rotateY(180deg);
+        }
+
+        .foto-cara,
+        .foto-qr {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .foto-cara {
+            width: 112px;
+            height: 112px;
+            border-radius: 999px;
+            object-fit: cover;
+            border: 1px solid var(--color-borde-noche);
+        }
+
+        .foto-qr {
+            border-radius: 20px;
+            background: var(--color-blanco);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotateY(180deg);
+        }
+
+        .foto-qr img {
+            width: 88px;
+            height: 88px;
+        }
+
+        .foto-insignia {
+            position: absolute;
+            right: -2px;
+            bottom: 2px;
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            background: var(--color-claro);
+            color: var(--color-noche);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--color-noche);
+        }
+
+        h1 {
+            margin: 20px 0 0;
+            font-size: 28px;
+            line-height: 1.15;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .cargo {
+            margin: 8px 0 0;
+            font-size: 17px;
+        }
+
+        .lugar {
+            margin: 6px 0 0;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            color: var(--color-gris-noche);
+        }
+
+        .boton-cita {
+            align-self: stretch;
+            margin-top: 24px;
+            height: 52px;
+            border-radius: 999px;
+            background: var(--color-naranja);
+            color: var(--color-noche);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .boton-cita:hover {
+            color: var(--color-noche);
+        }
+
+        .detalle-cita {
+            margin: 8px 0 0;
+            font-size: 13px;
+            color: var(--color-gris-noche);
+        }
+
+        /* ---------- Contenido ---------- */
+        main {
+            padding: 28px 16px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .presentacion {
+            padding: 0 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .frase {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            text-align: left;
+            cursor: pointer;
+            color: var(--color-texto);
+            font: 600 22px/1.25 'Manrope', system-ui, sans-serif;
+            letter-spacing: -0.01em;
+            min-height: 84px;
+        }
+
+        .frase span {
+            display: block;
+        }
+
+        .lema {
+            margin: 0;
+            font-size: 17px;
+            line-height: 1.55;
+            color: var(--color-texto-suave);
+        }
+
+        /* Bloque "¿Quiere una tarjeta como esta?" con la mini tarjeta asomando */
+        .gratis {
+            position: relative;
+            overflow: hidden;
+            background: var(--color-blanco);
+            border-radius: 20px;
+            padding: 20px;
+            text-decoration: none;
+            color: var(--color-texto);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .gratis:hover {
+            color: var(--color-texto);
+        }
+
+        .etiqueta-gratis {
+            align-self: flex-start;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: var(--color-naranja-oscuro);
+            color: var(--color-blanco);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .gratis-titulo {
+            font-size: 20px;
+            line-height: 1.25;
+            font-weight: 600;
+            max-width: 220px;
+        }
+
+        .gratis-texto {
+            font-size: 15px;
+            line-height: 1.45;
+            color: var(--color-texto-suave);
+            max-width: 220px;
+        }
+
+        .gratis-accion {
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--color-cobalto);
+        }
+
+        .mini {
+            position: absolute;
+            right: -56px;
+            top: 38px;
+            width: 140px;
+            height: 88px;
+            border-radius: 12px;
+            background: var(--color-noche);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transform: rotate(-14deg);
+            transition: transform 250ms ease-out;
+        }
+
+        .mini-lineas {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mini-lineas span {
+            height: 6px;
+            border-radius: 999px;
+        }
+
+        .mini-lineas span:first-child {
+            width: 72px;
+            background: var(--color-blanco);
+        }
+
+        .mini-lineas span:last-child {
+            width: 48px;
+            background: var(--color-gris-noche);
+        }
+
+        /* La mini tarjeta sale y se endereza: con foco de teclado, al pulsar,
+           con el ratón encima (solo si hay ratón) o al entrar en pantalla en móvil (clase desde el script) */
+        .gratis:focus-visible .mini,
+        .gratis:active .mini,
+        .gratis.mini-visible .mini {
+            transform: translate(-36px, -14px) rotate(-8deg);
+        }
+
+        @media (hover: hover) {
+            .gratis:hover .mini {
+                transform: translate(-36px, -14px) rotate(-8deg);
+            }
+        }
+
+        /* Filas de enlaces */
+        .enlaces {
+            background: var(--color-blanco);
+            border-radius: 20px;
+            padding: 4px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fila {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--color-separador);
+            text-decoration: none;
+            color: var(--color-texto);
+        }
+
+        .fila:last-child {
+            border-bottom: 0;
+        }
+
+        .fila:hover {
+            color: var(--color-texto);
+        }
+
+        .icono {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: var(--color-cobalto-claro);
+            color: var(--color-cobalto);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 200ms ease-out;
+        }
+
+        .fila-textos {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .fila-titulo {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .fila-detalle {
+            font-size: 15px;
+            color: var(--color-texto-suave);
+        }
+
+        .flecha {
+            flex-shrink: 0;
+            color: var(--color-texto-suave);
+            transition: transform 200ms ease-out;
+        }
+
+        .fila:focus-visible .icono {
+            transform: rotate(-6deg);
+        }
+
+        .fila:focus-visible .flecha {
+            transform: translateX(3px);
+        }
+
+        @media (hover: hover) {
+            .fila:hover .icono {
+                transform: rotate(-6deg);
             }
 
-            #mouse-glow {
-                display: none;
+            .fila:hover .flecha {
+                transform: translateX(3px);
+            }
+        }
+
+        /* Guardar contacto y Compartir */
+        .utilidades {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .boton-utilidad {
+            height: 48px;
+            border: 0;
+            border-radius: 999px;
+            background: var(--color-blanco);
+            color: var(--color-texto);
+            font: 500 15px 'Manrope', system-ui, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        /* Escala al pulsar */
+        .pulsa {
+            transition: transform 150ms ease-out;
+        }
+
+        .pulsa:active {
+            transform: scale(0.98);
+        }
+
+        /* Aviso (región viva) */
+        .aviso-zona {
+            min-height: 44px;
+        }
+
+        .aviso {
+            margin: 0;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: var(--color-noche);
+            color: var(--color-claro);
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .aviso svg {
+            flex-shrink: 0;
+            color: var(--color-naranja);
+        }
+
+        .pie {
+            margin-top: auto;
+            padding: 16px 24px 24px;
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--color-texto-suave);
+        }
+
+        .pie a {
+            color: var(--color-texto-suave);
+        }
+
+        /* Aparición suave de la frase, la nota AIR y el aviso */
+        @keyframes aparece {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
             }
 
-            .animate-item {
+            to {
                 opacity: 1;
                 transform: none;
             }
+        }
 
-            .action-item:hover,
-            .action-item:hover .action-icon,
-            .action-item:hover .action-arrow,
-            .utility-btn:hover {
-                transform: none;
+        .aparece {
+            animation: aparece 200ms ease-out both;
+        }
+
+        /* Movimiento reducido: los cambios ocurren sin animación */
+        @media (prefers-reduced-motion: reduce) {
+            .pulsa,
+            .flecha,
+            .icono,
+            .mini,
+            .giro {
+                transition: none !important;
             }
 
-            .action-item::before {
-                display: none;
+            .aparece {
+                animation: none;
             }
         }
     </style>
 </head>
 <body>
+    <div class="tarjeta">
+        <header class="cabecera oscuro">
+            <div class="marca">
+                <button type="button" class="boton-air" id="boton-air" aria-expanded="false" aria-controls="nota-air" aria-label="AI Resolution Labs: qué significa AIR">
+                    <svg class="logo-air" width="24" height="24" viewBox="0 0 32 32" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="logo-letras" d="M3.8 23 L8.8 9 L13.8 23"/><path class="logo-letras" d="M17.6 9 V23"/><path class="logo-erre" d="M21.4 23 V9 H24.4 A3.5 3.5 0 0 1 24.4 16 H21.4 M24.2 16 L28.2 23"/></svg>
+                    AI Resolution Labs
+                </button>
+            </div>
+            <p class="nota-air" id="nota-air" hidden><strong>AIR</strong> = Artificial Intelligence Resolution. Y también aire: por el aire fresco para su empresa y por el tiempo libre que le quedará en su día a día.</p>
 
-    <!-- Cuadrícula tecnológica de fondo -->
-    <div class="bg-grid" aria-hidden="true"></div>
-
-    <!-- Resplandor del ratón -->
-    <div id="mouse-glow" aria-hidden="true"></div>
-
-    <main class="card">
-        <!-- Sección de Foto Perfil -->
-        <div class="profile-container">
-            <div class="profile-glow" aria-hidden="true"></div>
-            <img src="img/perfil-240.webp"
-                 srcset="img/perfil-240.webp 240w, img/perfil-480.webp 480w"
-                 sizes="120px" width="120" height="120"
-                 alt="Foto de Pablo Ortega Insúa" class="profile-img" fetchpriority="high"
-                 onerror="this.onerror=null; this.removeAttribute('srcset'); this.src='img/perfil-fallback.svg'">
-        </div>
-
-        <!-- Nombre e Identidad -->
-        <h1>Pablo Ortega Insúa</h1>
-        <div class="specialty-badge">IA & Automatización No-Code</div>
-        
-        <!-- Descripción -->
-        <p class="description animate-item delay-5">
-            Ayudo a empresas a optimizar tiempo y reducir costes diseñando ecosistemas inteligentes y automatizaciones eficientes.
-        </p>
-
-        <!-- Listado de Botones (Acciones) -->
-        <div class="actions-list">
-            
-            <!-- CTA 1: Automatiza tu Negocio (formulario propio en /automatiza/) - Destacado -->
-            <a href="automatiza/" class="action-item featured-item animate-item delay-6">
-                <div class="action-icon">
-                    <!-- Rocket Icon -->
-                    <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4.5 16.5c-1.5 1.26-2 3.4-2 3.4s2.14-.5 3.4-2c1.47-1.47 2.9-2.24 3.73-2.73l-1.4-1.4z"/>
-                        <path d="M12 15c3.5-3.5 5.5-8.5 5.5-8.5s-5 2-8.5 5.5c-.83.83-1.6 2.26-2.73 3.73l1.4 1.4z"/>
-                        <path d="m14 6.5 3.5 3.5"/>
-                        <path d="M9 15c-1.5 1.5-2.5 3.5-2.5 3.5s2-1 3.5-2.5"/>
-                        <circle cx="15" cy="9" r="1"/>
-                    </svg>
-                </div>
-                <div class="action-content">
-                    <div class="action-title">Automatiza tu Negocio <span aria-hidden="true">🚀</span></div>
-                    <div class="action-sub">Cuéntame tu caso y diseñemos tu solución</div>
-                </div>
-                <div class="action-arrow">
-                    <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                </div>
-            </a>
-
-            <!-- CTA 2: Reserva Cita (Cal.com) - Destacado -->
-            <a href="https://cal.com/pablo-ortega-insua-wdoysa" target="_blank" rel="noopener noreferrer" class="action-item featured-item animate-item delay-7">
-                <div class="action-icon">
-                    <!-- Calendar Icon -->
-                    <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                        <line x1="16" y1="2" x2="16" y2="6"/>
-                        <line x1="8" y1="2" x2="8" y2="6"/>
-                        <line x1="3" y1="10" x2="21" y2="10"/>
-                    </svg>
-                </div>
-                <div class="action-content">
-                    <div class="action-title">Reserva una cita conmigo <span aria-hidden="true">📅</span></div>
-                    <div class="action-sub">Agenda una videollamada de 15 minutos</div>
-                    <span class="sr-only">(se abre en una pestaña nueva)</span>
-                </div>
-                <div class="action-arrow">
-                    <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                </div>
-            </a>
-
-            <!-- CTA 3: Solicitar Tarjeta de Visita (formulario propio en /tarjeta/) - Destacado Dorado -->
-            <a href="tarjeta/" class="action-item amber-item animate-item delay-8">
-                <div class="action-icon">
-                    <!-- Sparkles Icon -->
-                    <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-                        <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5 5 3Z"/>
-                        <path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1 1-2.5Z"/>
-                    </svg>
-                </div>
-                <div class="action-content">
-                    <div class="action-title">¿Quieres tu propia Tarjeta Inteligente? </div>
-                    <div class="action-sub">Gratis: pídela aquí y te la preparo yo</div>
-                </div>
-                <div class="action-arrow">
-                    <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                </div>
-            </a>
-
-            <!-- CTA 4: Web Corporativa (AI Resolution Labs) -->
-            <a href="https://www.airesolutionlabs.com/" target="_blank" rel="noopener noreferrer" class="action-item animate-item delay-8">
-                <div class="action-icon">
-                    <!-- Globe Icon -->
-                    <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="2" y1="12" x2="22" y2="12"/>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                    </svg>
-                </div>
-                <div class="action-content">
-                    <div class="action-title">AI Resolution Labs <span aria-hidden="true">🌐</span></div>
-                    <div class="action-sub">Soluciones y desarrollo de IA para tu empresa</div>
-                    <span class="sr-only">(se abre en una pestaña nueva)</span>
-                </div>
-                <div class="action-arrow">
-                    <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                </div>
-            </a>
-
-            <!-- CTA 5: LinkedIn -->
-            <a href="https://www.linkedin.com/in/pablo-ortega-ins%C3%BAa-775b92277/" target="_blank" rel="noopener noreferrer" class="action-item animate-item delay-9">
-                <div class="action-icon">
-                    <!-- LinkedIn Icon -->
-                    <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-                        <rect x="2" y="9" width="4" height="12"/>
-                        <circle cx="4" cy="4" r="2"/>
-                    </svg>
-                </div>
-                <div class="action-content">
-                    <div class="action-title">Conectar en LinkedIn</div>
-                    <div class="action-sub">Mi red profesional e ideas de automatización</div>
-                    <span class="sr-only">(se abre en una pestaña nueva)</span>
-                </div>
-                <div class="action-arrow">
-                    <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                </div>
-            </a>
-
-            <!-- CTA 6: Email -->
-            <a href="mailto:info@airesolutionlabs.com" onclick="handleEmailClick(event)" class="action-item animate-item delay-9">
-                <div class="action-icon">
-                    <!-- Mail Icon -->
-                    <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                        <polyline points="22,6 12,13 2,6"/>
-                    </svg>
-                </div>
-                <div class="action-content">
-                    <div class="action-title">Escríbeme por Email</div>
-                    <div class="action-sub">info@airesolutionlabs.com</div>
-                </div>
-                <div class="action-arrow">
-                    <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                </div>
-            </a>
-
-        </div>
-
-        <!-- Botones de Utilidades (Guardar Contacto, Compartir) -->
-        <div class="utilities-grid animate-item delay-9">
-            <button type="button" onclick="downloadVCard()" class="utility-btn">
-                <!-- User Plus Icon -->
-                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                    <circle cx="8.5" cy="7" r="4"/>
-                    <line x1="20" y1="8" x2="20" y2="14"/>
-                    <line x1="23" y1="11" x2="17" y2="11"/>
-                </svg>
-                Guardar Contacto
+            <button type="button" class="foto" id="foto" aria-pressed="false" aria-label="Ver el código QR de esta tarjeta">
+                <span class="giro">
+                    <img class="foto-cara" src="img/perfil-240.webp"
+                         srcset="img/perfil-240.webp 240w, img/perfil-480.webp 480w"
+                         sizes="112px" width="112" height="112" alt="Pablo Ortega Insúa" fetchpriority="high"
+                         onerror="this.onerror=null; this.removeAttribute('srcset'); this.src='img/perfil-fallback.svg'">
+                    <span class="foto-qr">
+                        <img src="img/qr-founder.svg" alt="Código QR de founder.airesolutionlabs.com" width="88" height="88" loading="lazy">
+                    </span>
+                </span>
+                <span class="foto-insignia" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3M21 21v.01M12 7v3a2 2 0 0 1-2 2H7M3 12h.01M12 3h.01M12 16v.01M16 12h1M21 12v.01M12 21v-1"/></svg>
+                </span>
             </button>
-            <button type="button" onclick="shareCard()" class="utility-btn">
-                <!-- Share Icon -->
-                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                    <polyline points="16 6 12 2 8 6"/>
-                    <line x1="12" y1="2" x2="12" y2="15"/>
-                </svg>
-                <span id="share-btn-text">Compartir</span>
-            </button>
-        </div>
-    </main>
 
-    <!-- Toast de Notificación (región viva: los lectores de pantalla anuncian su texto) -->
-    <div id="toast-notification" class="toast" role="status" aria-live="polite" aria-atomic="true">
-        <span class="toast-icon" aria-hidden="true">
-            <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"/>
-            </svg>
-        </span>
-        <span id="toast-text"></span>
-        <span id="toast-emoji" aria-hidden="true"></span>
+            <h1>Pablo Ortega Insúa</h1>
+            <p class="cargo">Consultor de tecnología e IA · Fundador de AI Resolution Labs</p>
+            <p class="lugar">Desde Sevilla, para toda España</p>
+
+            <a class="boton-cita pulsa" href="https://cal.com/pablo-ortega-insua-wdoysa" target="_blank" rel="noopener noreferrer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 2v4M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+                Reservar diagnóstico gratuito
+                <span class="sr-only">(se abre en una pestaña nueva)</span>
+            </a>
+            <p class="detalle-cita">Videollamada de 30 minutos, sin compromiso</p>
+        </header>
+
+        <main>
+            <section class="presentacion" aria-label="Presentación">
+                <button type="button" class="frase" id="frase" aria-label="La IA puede quitarle horas de trabajo. Yo averiguo cuáles. (pulse para ver otra frase)"><span>La IA puede quitarle horas de trabajo. Yo averiguo cuáles.</span></button>
+                <p class="lema">Lo pruebo, se lo dejo funcionando y le enseño a usarlo, sin tecnicismos.</p>
+            </section>
+
+            <a class="gratis pulsa" id="gratis" href="tarjeta/">
+                <span class="etiqueta-gratis">GRATIS</span>
+                <span class="gratis-titulo">¿Quiere una tarjeta como esta?</span>
+                <span class="gratis-texto">Con su nombre, su logo y sus enlaces. Usted me da los datos y yo se la preparo.</span>
+                <span class="gratis-accion">Quiero la mía
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </span>
+                <span class="mini" aria-hidden="true">
+                    <svg class="logo-air logo-mini" width="20" height="20" viewBox="0 0 32 32" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="logo-letras" d="M3.8 23 L8.8 9 L13.8 23"/><path class="logo-letras" d="M17.6 9 V23"/><path class="logo-erre" d="M21.4 23 V9 H24.4 A3.5 3.5 0 0 1 24.4 16 H21.4 M24.2 16 L28.2 23"/></svg>
+                    <span class="mini-lineas"><span></span><span></span></span>
+                </span>
+            </a>
+
+            <nav class="enlaces" aria-label="Enlaces">
+                <a class="fila" href="automatiza/">
+                    <span class="icono"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                    <span class="fila-textos"><span class="fila-titulo">Cuénteme qué le quita tiempo</span><span class="fila-detalle">Y le digo qué se puede automatizar</span></span>
+                    <svg class="flecha" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6"/></svg>
+                </a>
+                <a class="fila" href="https://www.airesolutionlabs.com/" target="_blank" rel="noopener noreferrer">
+                    <span class="icono"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg></span>
+                    <span class="fila-textos"><span class="fila-titulo">Qué hago</span><span class="fila-detalle">www.airesolutionlabs.com</span><span class="sr-only">(se abre en una pestaña nueva)</span></span>
+                    <svg class="flecha" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg>
+                </a>
+                <a class="fila" href="https://www.linkedin.com/in/pablo-ortega-ins%C3%BAa-775b92277/" target="_blank" rel="noopener noreferrer">
+                    <span class="icono"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg></span>
+                    <span class="fila-textos"><span class="fila-titulo">LinkedIn</span><span class="fila-detalle">Lo que voy probando, contado claro</span><span class="sr-only">(se abre en una pestaña nueva)</span></span>
+                    <svg class="flecha" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg>
+                </a>
+                <a class="fila" id="fila-email" href="mailto:info@airesolutionlabs.com">
+                    <span class="icono"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+                    <span class="fila-textos"><span class="fila-titulo">Escríbame</span><span class="fila-detalle">info@airesolutionlabs.com</span></span>
+                    <svg class="flecha" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6"/></svg>
+                </a>
+            </nav>
+
+            <div class="utilidades">
+                <button type="button" class="boton-utilidad pulsa" id="guardar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+                    Guardar contacto
+                </button>
+                <button type="button" class="boton-utilidad pulsa" id="compartir">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+                    <span id="compartir-texto">Compartir</span>
+                </button>
+            </div>
+
+            <!-- Aviso (región viva): los lectores de pantalla anuncian su texto -->
+            <div class="aviso-zona" role="status" aria-live="polite" aria-atomic="true">
+                <p class="aviso" id="aviso" hidden>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>
+                    <span id="aviso-texto"></span>
+                </p>
+            </div>
+        </main>
+
+        <footer class="pie">
+            <span>AI Resolution Labs · Sevilla</span>
+            <a href="privacidad/">Privacidad</a>
+        </footer>
     </div>
 
     <script>
-        // Datos de la tarjeta que usa el script (vCard, compartir y email).
-        // Los textos visibles de la página están en el HTML de arriba.
+        // Datos de la tarjeta que usa el script (vCard, compartir, email y frases).
+        // Los demás textos visibles están en el HTML de arriba.
         const CONFIG = {
             firstName: 'Pablo',
             lastName: 'Ortega Insúa',
             fullName: 'Pablo Ortega Insúa',
             org: 'AI Resolution Labs',
-            jobTitle: 'Especialista en IA y Automatización No-Code',
+            jobTitle: 'Consultor de tecnología e IA',
             email: 'info@airesolutionlabs.com',
             website: 'https://www.airesolutionlabs.com/',
             linkedin: 'https://www.linkedin.com/in/pablo-ortega-ins%C3%BAa-775b92277/',
-            note: 'Ayudo a empresas a optimizar tiempo y reducir costes diseñando ecosistemas inteligentes y automatizaciones eficientes.',
+            note: 'Consultor de tecnología e IA · Fundador de AI Resolution Labs. Lo pruebo, se lo dejo funcionando y le enseño a usarlo, sin tecnicismos.',
             vcardFileName: 'Pablo_Ortega_Insua.vcf',
-            shareTitle: 'Pablo Ortega Insúa | Especialista en IA y Automatización No-Code',
-            shareText: 'Echa un vistazo a mi tarjeta de visita digital interactiva. Ayudo a empresas a optimizar tiempo y reducir costes con IA.'
+            shareTitle: 'Pablo Ortega Insúa · Consultor de tecnología e IA',
+            shareText: 'Consultor de tecnología e IA · Fundador de AI Resolution Labs. Lo pruebo, se lo dejo funcionando y le enseño a usarlo, sin tecnicismos.',
+            // Frase principal: al cargar se elige una al azar y al tocarla pasa a la siguiente
+            frases: [
+                'La IA puede quitarle horas de trabajo. Yo averiguo cuáles.',
+                '¿Cuántas veces a la semana copia y pega lo mismo? Eso tiene arreglo.',
+                'Pruebo las herramientas de IA para que usted use solo las que funcionan.',
+                'Sabe que la IA le puede ayudar. Yo le digo por dónde empezar.',
+                'Usted se ocupa de su negocio y yo de que la tecnología le eche una mano.'
+            ]
         };
 
-        // Efecto de resplandor que sigue al ratón
-        const glow = document.getElementById('mouse-glow');
-        
-        // Solo activamos el seguimiento en dispositivos con cursor y sin preferencia de movimiento reducido
-        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        if (window.matchMedia("(pointer: fine)").matches && !reduceMotion) {
-            let frame = 0;
-            document.addEventListener('mousemove', (e) => {
-                // Un solo repintado por fotograma, aunque lleguen muchos eventos
-                if (frame) return;
-                frame = requestAnimationFrame(() => {
-                    glow.style.setProperty('--glow-x', `${e.clientX}px`);
-                    glow.style.setProperty('--glow-y', `${e.clientY}px`);
-                    frame = 0;
-                });
-            }, { passive: true });
+        // Repite una animación CSS quitando y volviendo a poner la clase
+        function animar(el, clase = 'aparece') {
+            el.classList.remove(clase);
+            void el.offsetWidth;
+            el.classList.add(clase);
         }
 
+        // ---------- Logo AIR: muestra u oculta la nota ----------
+        const botonAir = document.getElementById('boton-air');
+        const notaAir = document.getElementById('nota-air');
+        botonAir.addEventListener('click', () => {
+            const abrir = botonAir.getAttribute('aria-expanded') !== 'true';
+            botonAir.setAttribute('aria-expanded', String(abrir));
+            notaAir.hidden = !abrir;
+            if (abrir) animar(notaAir);
+        });
+
+        // ---------- Foto: gira y enseña el QR ----------
+        const foto = document.getElementById('foto');
+        foto.addEventListener('click', () => {
+            foto.setAttribute('aria-pressed', String(foto.getAttribute('aria-pressed') !== 'true'));
+        });
+
+        // ---------- Frase principal ----------
+        const botonFrase = document.getElementById('frase');
+        let fraseActual = Math.floor(Math.random() * CONFIG.frases.length);
+        function ponerFrase(n, conAnimacion) {
+            fraseActual = (n + CONFIG.frases.length) % CONFIG.frases.length;
+            const texto = CONFIG.frases[fraseActual];
+            const span = document.createElement('span');
+            span.textContent = texto;
+            botonFrase.replaceChildren(span);
+            botonFrase.setAttribute('aria-label', texto + ' (pulse para ver otra frase)');
+            if (conAnimacion) span.classList.add('aparece');
+        }
+        ponerFrase(fraseActual, false);
+        botonFrase.addEventListener('click', () => ponerFrase(fraseActual + 1, true));
+
+        // ---------- Mini tarjeta en móvil: sale una vez al entrar en pantalla ----------
+        // En ordenador la mueven el ratón y el foco (CSS); aquí solo los dispositivos sin hover.
+        const gratis = document.getElementById('gratis');
+        if (window.matchMedia('(hover: none)').matches && 'IntersectionObserver' in window) {
+            const observador = new IntersectionObserver((entradas) => {
+                if (entradas.some((e) => e.isIntersecting)) {
+                    gratis.classList.add('mini-visible');
+                    observador.disconnect();
+                }
+            }, { threshold: 0.6 });
+            observador.observe(gratis);
+        }
+
+        // ---------- Aviso (región viva) ----------
+        const aviso = document.getElementById('aviso');
+        let avisoReloj;
+        function mostrarAviso(mensaje) {
+            document.getElementById('aviso-texto').textContent = mensaje;
+            aviso.hidden = false;
+            animar(aviso);
+            clearTimeout(avisoReloj);
+            avisoReloj = setTimeout(() => { aviso.hidden = true; }, 2600);
+        }
+
+        // ---------- Guardar contacto (vCard) ----------
         // Escapa los caracteres especiales de un valor vCard (\ , ; y saltos de línea)
         function escapeVCard(value) {
             return String(value)
@@ -821,7 +850,6 @@
                 .replace(/\r?\n/g, '\\n');
         }
 
-        // Función para descargar el contacto como vCard (.vcf)
         function downloadVCard() {
             const vcardData = [
                 'BEGIN:VCARD',
@@ -848,48 +876,37 @@
             // Algunos navegadores cancelan la descarga si el enlace se revoca en el mismo instante
             setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-            showToast("¡Contacto descargado con éxito!");
+            mostrarAviso('Contacto listo. Ábralo para guardarlo en su agenda.');
         }
+        document.getElementById('guardar').addEventListener('click', downloadVCard);
 
-        // Función para compartir la tarjeta (Web Share API con Fallback)
+        // ---------- Compartir (menú nativo o copia del enlace) ----------
         async function shareCard() {
             const cardUrl = window.location.href;
-            const shareData = {
-                title: CONFIG.shareTitle,
-                text: CONFIG.shareText,
-                url: cardUrl
-            };
+            const shareData = { title: CONFIG.shareTitle, text: CONFIG.shareText, url: cardUrl };
 
-            // Detección de soporte de la Web Share API
             if (navigator.share) {
                 try {
                     await navigator.share(shareData);
                 } catch (error) {
-                    // AbortError = el usuario cerró el menú sin compartir. Cualquier otro fallo: copiar el enlace.
-                    if (error.name !== 'AbortError') {
-                        copyToClipboardFallback(cardUrl);
-                    }
+                    // AbortError = se cerró el menú sin compartir. Cualquier otro fallo: copiar el enlace.
+                    if (error.name !== 'AbortError') copyToClipboardFallback(cardUrl);
                 }
             } else {
-                // Fallback: Copiar URL al portapapeles y dar feedback en la UI
                 copyToClipboardFallback(cardUrl);
             }
         }
+        document.getElementById('compartir').addEventListener('click', shareCard);
 
-        // Mecanismo de respaldo (fallback) para copiar al portapapeles y dar feedback visual rápido en el botón
+        // Copia el enlace y da aviso en el botón y en la región viva
         function copyToClipboardFallback(text) {
-            const btnTextNode = document.getElementById('share-btn-text');
-            const originalText = btnTextNode ? btnTextNode.textContent : 'Compartir';
+            const btnTextNode = document.getElementById('compartir-texto');
+            const originalText = btnTextNode.textContent;
 
             const handleFeedback = () => {
-                if (btnTextNode) {
-                    btnTextNode.textContent = '¡Enlace copiado!';
-                    // Restaurar el texto del botón tras 2 segundos
-                    setTimeout(() => {
-                        btnTextNode.textContent = originalText;
-                    }, 2000);
-                }
-                showToast("¡Enlace de tarjeta copiado al portapapeles!");
+                btnTextNode.textContent = '¡Enlace copiado!';
+                setTimeout(() => { btnTextNode.textContent = originalText; }, 2000);
+                mostrarAviso('¡Enlace de tarjeta copiado al portapapeles!');
             };
 
             if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -903,62 +920,35 @@
 
         // Último recurso de copiado para navegadores antiguos
         function fallbackLegacyCopy(text, callback) {
-            const tempInput = document.createElement("input");
+            const tempInput = document.createElement('input');
             tempInput.value = text;
             tempInput.style.position = 'absolute';
             tempInput.style.left = '-9999px';
             document.body.appendChild(tempInput);
             tempInput.select();
-            
+
             try {
-                document.execCommand("copy");
+                document.execCommand('copy');
                 callback();
             } catch (err) {
                 console.error('No se pudo copiar el enlace:', err);
-                showToast("Error al copiar el enlace.");
+                mostrarAviso('Error al copiar el enlace.');
             } finally {
                 document.body.removeChild(tempInput);
             }
         }
 
-        // Mostrar notificación tipo Toast. El emoji es decorativo y no lo leen los lectores de pantalla.
-        let toastTimer;
-        function showToast(message, emoji = '') {
-            const toast = document.getElementById('toast-notification');
-
-            document.getElementById('toast-text').textContent = message;
-            document.getElementById('toast-emoji').textContent = emoji;
-            toast.classList.add('show');
-
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
-        // Manejar el clic en el botón de email (copiado y mailto)
-        function handleEmailClick(event) {
+        // ---------- Email: copia la dirección y abre la aplicación de correo ----------
+        document.getElementById('fila-email').addEventListener('click', () => {
             const email = CONFIG.email;
-            
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(email)
-                    .then(() => {
-                        showToast("¡Correo copiado! Abriendo app de email...", "✉️");
-                    })
-                    .catch(() => {
-                        showToast("Abriendo tu aplicación de correo...", "✉️");
-                    });
+                    .then(() => mostrarAviso('¡Correo copiado! Abriendo app de email...'))
+                    .catch(() => mostrarAviso('Abriendo su aplicación de correo...'));
             } else {
-                // Fallback de copiado antiguo
-                const tempInput = document.createElement("input");
-                tempInput.value = email;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                document.execCommand("copy");
-                document.body.removeChild(tempInput);
-                showToast("¡Correo copiado! Abriendo app de email...", "✉️");
+                fallbackLegacyCopy(email, () => mostrarAviso('¡Correo copiado! Abriendo app de email...'));
             }
-        }
+        });
 
         // App instalable: registra el service worker (sw.js) cuando la página ya ha cargado
         if ('serviceWorker' in navigator) {

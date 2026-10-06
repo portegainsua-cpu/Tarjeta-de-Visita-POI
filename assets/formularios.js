@@ -26,33 +26,33 @@
 
     var REGLAS = {
         tarjeta: {
-            nombre: { obligatorio: true, min: 2, max: 80, msg: 'Escribe tu nombre (mínimo 2 letras).' },
-            negocio: { obligatorio: true, min: 2, max: 80, msg: 'Escribe el nombre de tu negocio.' },
+            nombre: { obligatorio: true, min: 2, max: 80, msg: 'Escriba su nombre (mínimo 2 letras).' },
+            negocio: { obligatorio: true, min: 2, max: 80, msg: 'Escriba el nombre de su negocio.' },
             cargo: { max: 60, msg: 'Máximo 60 caracteres.' },
-            sector: { obligatorio: true, msg: 'Elige un sector.' },
-            sector_otro: { obligatorio: true, min: 2, max: 60, soloSiOtro: true, msg: 'Escribe tu sector (mínimo 2 letras).' },
-            whatsapp: { obligatorio: true, tipo: 'tel', msg: 'Escribe un número de WhatsApp válido, por ejemplo 600 123 456.' },
-            email: { obligatorio: true, tipo: 'email', msg: 'Escribe un email válido.' },
-            instagram: { tipo: 'instagram', msg: 'Escribe tu usuario de Instagram, por ejemplo @minegocio.' },
-            web: { tipo: 'web', msg: 'Escribe una dirección web válida, por ejemplo minegocio.es.' },
-            botones: { grupo: true, min: 1, msg: 'Elige al menos un botón.' },
+            sector: { obligatorio: true, msg: 'Elija un sector.' },
+            sector_otro: { obligatorio: true, min: 2, max: 60, soloSiOtro: true, msg: 'Escriba su sector (mínimo 2 letras).' },
+            whatsapp: { obligatorio: true, tipo: 'tel', msg: 'Escriba un número de WhatsApp válido, por ejemplo 600 123 456.' },
+            email: { obligatorio: true, tipo: 'email', msg: 'Escriba un email válido.' },
+            instagram: { tipo: 'instagram', msg: 'Escriba su usuario de Instagram, por ejemplo @minegocio.' },
+            web: { tipo: 'web', msg: 'Escriba una dirección web válida, por ejemplo minegocio.es.' },
+            botones: { grupo: true, min: 1, msg: 'Elija al menos un botón.' },
             mejorar: { grupo: true }
         },
         automatiza: {
-            nombre: { obligatorio: true, min: 2, max: 80, msg: 'Escribe tu nombre (mínimo 2 letras).' },
-            empresa: { obligatorio: true, min: 2, max: 80, msg: 'Escribe el nombre de tu empresa.' },
-            sector: { obligatorio: true, msg: 'Elige un sector.' },
-            sector_otro: { obligatorio: true, min: 2, max: 60, soloSiOtro: true, msg: 'Escribe tu sector (mínimo 2 letras).' },
-            email: { obligatorio: true, tipo: 'email', msg: 'Escribe un email válido.' },
-            whatsapp: { tipo: 'tel', msg: 'Escribe un teléfono válido, por ejemplo 600 123 456.' },
-            tamano: { obligatorio: true, msg: 'Elige el tamaño de tu equipo.' },
-            que: { grupo: true, min: 1, msg: 'Elige al menos una opción.' },
+            nombre: { obligatorio: true, min: 2, max: 80, msg: 'Escriba su nombre (mínimo 2 letras).' },
+            empresa: { obligatorio: true, min: 2, max: 80, msg: 'Escriba el nombre de su empresa.' },
+            sector: { obligatorio: true, msg: 'Elija un sector.' },
+            sector_otro: { obligatorio: true, min: 2, max: 60, soloSiOtro: true, msg: 'Escriba su sector (mínimo 2 letras).' },
+            email: { obligatorio: true, tipo: 'email', msg: 'Escriba un email válido.' },
+            whatsapp: { tipo: 'tel', msg: 'Escriba un teléfono válido, por ejemplo 600 123 456.' },
+            tamano: { obligatorio: true, msg: 'Elija el tamaño de su equipo.' },
+            que: { grupo: true, min: 1, msg: 'Elija al menos una opción.' },
             descripcion: { max: 1000, msg: 'Máximo 1.000 caracteres.' },
-            contacto: { radio: true, obligatorio: true, msg: 'Elige cómo prefieres que te contacte.' }
+            contacto: { radio: true, obligatorio: true, msg: 'Elija cómo prefiere que le contacte.' }
         }
     }[tipo];
 
-    var MSG_PRIVACIDAD = 'Tienes que aceptar la política de privacidad para enviar el formulario.';
+    var MSG_PRIVACIDAD = 'Tiene que aceptar la política de privacidad para enviar el formulario.';
 
     /* ---------- utilidades ---------- */
     function $(sel, ctx) { return (ctx || document).querySelector(sel); }
@@ -94,7 +94,7 @@
         if (r.grupo) return v.length < (r.min || 0) ? r.msg : '';
         if (!v) {
             if (nombre === 'whatsapp' && tipo === 'automatiza' && valorCampo('contacto') && valorCampo('contacto') !== 'Email') {
-                return 'Escribe un teléfono para poder contactarte por ' + valorCampo('contacto') + '.';
+                return 'Escriba un teléfono para poder contactarle por ' + valorCampo('contacto') + '.';
             }
             return r.obligatorio ? r.msg : '';
         }
@@ -173,7 +173,7 @@
         try {
             ts.id = window.turnstile.render('#turnstile', {
                 sitekey: AJUSTES.TURNSTILE_SITEKEY,
-                theme: 'dark',
+                theme: 'light',
                 language: 'es',
                 appearance: 'interaction-only',
                 callback: function (tok) { ts.fallo = false; resolverToken(tok); },
@@ -220,7 +220,7 @@
 
     function mostrarResumen(lista) {
         if (!lista.length) { resumen.classList.remove('visible'); resumen.innerHTML = ''; return; }
-        resumen.innerHTML = '<strong>Revisa ' + (lista.length === 1 ? 'este campo' : 'estos ' + lista.length + ' campos') + ':</strong><ul>' +
+        resumen.innerHTML = '<strong>Revise ' + (lista.length === 1 ? 'este campo' : 'estos ' + lista.length + ' campos') + ':</strong><ul>' +
             lista.map(function (e) { return '<li><a href="#' + e.id + '">' + e.msg + '</a></li>'; }).join('') + '</ul>';
         resumen.classList.add('visible');
         resumen.focus();
@@ -233,7 +233,7 @@
     }
 
     function mostrarAlternativa(motivo) {
-        alternativa.innerHTML = motivo + ' Escríbeme a <a href="mailto:' + AJUSTES.EMAIL_CONTACTO + '">' +
+        alternativa.innerHTML = motivo + ' Escríbame a <a href="mailto:' + AJUSTES.EMAIL_CONTACTO + '">' +
             AJUSTES.EMAIL_CONTACTO + '</a> y lo vemos directamente.';
         alternativa.classList.add('visible');
     }
@@ -324,16 +324,16 @@
                 if (r && r.error === 'validacion' && r.campos) {
                     var lista = r.campos.map(function (c) {
                         if (c === 'privacidad') return { id: 'privacidad', msg: MSG_PRIVACIDAD };
-                        var msg = (REGLAS[c] && REGLAS[c].msg) || 'Revisa este campo.';
+                        var msg = (REGLAS[c] && REGLAS[c].msg) || 'Revise este campo.';
                         marcar(c, msg);
                         var f = primerFoco(c);
                         return { id: f ? f.id : '', msg: msg };
                     });
                     mostrarResumen(lista);
                 } else if (r && r.error === 'limite') {
-                    mostrarAlternativa('Has enviado varias solicitudes seguidas. Espera un rato antes de volver a intentarlo.');
+                    mostrarAlternativa('Ha enviado varias solicitudes seguidas. Espere un rato antes de volver a intentarlo.');
                 } else if (r && r.error === 'verificacion') {
-                    estado.textContent = 'No se ha podido verificar el envío. Vuelve a pulsar el botón.';
+                    estado.textContent = 'No se ha podido verificar el envío. Vuelva a pulsar el botón.';
                 } else {
                     mostrarAlternativa('No se ha podido enviar el formulario.');
                 }
