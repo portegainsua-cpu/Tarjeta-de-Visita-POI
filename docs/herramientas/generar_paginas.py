@@ -1,3 +1,4 @@
+# OBSOLETO desde el rediseño AIR (06/10/2026): genera el diseño antiguo, no usar
 """Genera tarjeta/, automatiza/ y privacidad/ con la misma cabecera. Ejecutar: python3 generar_paginas.py"""
 from pathlib import Path
 from html import escape
