@@ -32,9 +32,14 @@ const ctx = {
       }),
     }),
   },
-  CacheService: { getScriptCache: () => ({ get: (k) => cache[k], put: (k, v) => { cache[k] = v; } }) },
-  Utilities: { getUuid: () => Math.random().toString(16).slice(2, 10) + '-x', base64EncodeWebSafe: (s) => Buffer.from(s).toString('base64') },
-  LockService: { getScriptLock: () => ({ waitLock: () => {}, releaseLock: () => {} }) },
+  CacheService: { getScriptCache: () => ({
+    get: (k) => cache[k], put: (k, v) => { cache[k] = v; }, remove: (k) => { delete cache[k]; } }) },
+  Utilities: {
+    getUuid: () => Math.random().toString(16).slice(2, 10) + '-x',
+    base64EncodeWebSafe: (s) => Buffer.from(s).toString('base64'),
+    formatDate: (d, zona) => String(Number(new Intl.DateTimeFormat('es-ES', { hour: 'numeric', hourCycle: 'h23', timeZone: zona }).format(d))),
+  },
+  LockService: { getScriptLock: () => ({ waitLock: () => {}, tryLock: () => true, releaseLock: () => {} }) },
   SpreadsheetApp: { getActiveSpreadsheet: () => ({ getSheetByName: () => hoja, getUrl: () => 'https://sheet' }) },
   MailApp: { getRemainingDailyQuota: () => 100 },
   GmailApp: { getAliases: () => ['info@airesolutionlabs.com'], sendEmail: (to, asunto, texto, o) => enviados.push({ to, asunto, texto, o }) },
