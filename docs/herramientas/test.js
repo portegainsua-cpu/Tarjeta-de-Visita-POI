@@ -1,4 +1,5 @@
 // Pruebas del Apps Script con servicios de Google simulados. Ejecutar: node test.js
+// Usa Code.gs de esta carpeta si existe; si no, el de docs/apps-script/.
 const fs = require('fs');
 const vm = require('vm');
 const assert = require('assert');
@@ -8,6 +9,8 @@ function crearEntorno(opts = {}) {
   let cabeceras = null;
   const enviados = [];
   const cache = {};
+  const logs = [];
+  const llamadas = { alias: 0 };
   const props = Object.assign({ TURNSTILE_SECRET: 'secreto', TEST_MODE: 'false' }, opts.props || {});
   const hoja = {
     getLastColumn: () => (cabeceras ? cabeceras.length : 0),
@@ -19,7 +22,7 @@ function crearEntorno(opts = {}) {
     appendRow: (fila) => filas.push(fila),
   };
   const ctx = {
-    console,
+    console: { log: (s) => logs.push(s), error: () => {} },
     ContentService: {
       MimeType: { JSON: 'json' },
       createTextOutput: (s) => ({ setMimeType: () => ({ body: JSON.parse(s) }) }),
@@ -31,15 +34,25 @@ function crearEntorno(opts = {}) {
           opts.turnstile || { success: o.payload.response === 'ok-token', hostname: 'founder.airesolutionlabs.com' }),
       }),
     },
-    CacheService: { getScriptCache: () => ({ get: (k) => cache[k], put: (k, v) => { cache[k] = v; } }) },
-    Utilities: { getUuid: () => 'abcdef12-3456', base64EncodeWebSafe: (s) => Buffer.from(s).toString('base64') },
-    LockService: { getScriptLock: () => ({ waitLock: () => {}, releaseLock: () => {} }) },
+    CacheService: { getScriptCache: () => ({
+      get: (k) => cache[k], put: (k, v) => { cache[k] = v; }, remove: (k) => { delete cache[k]; } }) },
+    Utilities: {
+      getUuid: () => 'abcdef12-3456',
+      base64EncodeWebSafe: (s) => Buffer.from(s).toString('base64'),
+      // Solo el formato 'H' (hora 0-23), que es el que usa el script
+      formatDate: (d, zona, formato) => {
+        assert.strictEqual(formato, 'H');
+        return String(Number(new Intl.DateTimeFormat('es-ES', { hour: 'numeric', hourCycle: 'h23', timeZone: zona }).format(d)));
+      },
+    },
+    LockService: { getScriptLock: () => ({
+      waitLock: () => {}, tryLock: () => !opts.bloqueoOcupado, releaseLock: () => {} }) },
     SpreadsheetApp: {
       getActiveSpreadsheet: () => ({ getSheetByName: () => hoja, getUrl: () => 'https://sheet' }),
     },
     MailApp: { getRemainingDailyQuota: () => (opts.cuota == null ? 100 : opts.cuota) },
     GmailApp: {
-      getAliases: () => opts.alias === false ? [] : ['info@airesolutionlabs.com'],
+      getAliases: () => { llamadas.alias++; return opts.alias === false ? [] : ['info@airesolutionlabs.com']; },
       sendEmail: (to, asunto, texto, o) => {
         if (opts.fallaCorreo) throw new Error('fallo');
         enviados.push({ to, asunto, texto, o });
@@ -48,9 +61,11 @@ function crearEntorno(opts = {}) {
     Session: { getEffectiveUser: () => ({ getEmail: () => 'cuenta@gmail.com' }) },
   };
   vm.createContext(ctx);
-  vm.runInContext(fs.readFileSync(__dirname + '/Code.gs', 'utf8'), ctx);
+  const local = __dirname + '/Code.gs';
+  const ruta = fs.existsSync(local) ? local : __dirname + '/../apps-script/Code.gs';
+  vm.runInContext(fs.readFileSync(ruta, 'utf8'), ctx);
   cabeceras = vm.runInContext('CABECERAS', ctx).slice();
-  return { ctx, filas, enviados, cabeceras, cache };
+  return { ctx, filas, enviados, cabeceras, cache, logs, llamadas };
 }
 
 function post(env, cuerpo) {
@@ -115,7 +130,7 @@ prueba('automatiza válida: neutraliza fórmulas y ofrece Cal.com', () => {
   assert.ok(env.enviados[1].texto.includes('cal.com'));
   // Compromiso de plazo en la confirmación
   assert.ok(env.enviados[1].texto.includes(
-    'He recibido tu consulta sobre citas y reservas y te responderé lo antes posible, como máximo en 72 horas.'));
+    'He recibido su consulta sobre citas y reservas y le responderé lo antes posible, como máximo en 72 horas.'));
   assert.ok(env.enviados[1].o.htmlBody.includes('como máximo en 72 horas.'));
   assert.ok(!env.enviados[1].texto.includes('próximas'));
 });
@@ -232,11 +247,11 @@ prueba('contacto válido desde la web: guarda en Solicitudes y envía aviso y co
 
   assert.strictEqual(conf.to, 'marta@ejemplo.com');
   assert.strictEqual(conf.o.from, 'info@airesolutionlabs.com');
-  assert.strictEqual(conf.asunto, 'He recibido tu mensaje');
-  assert.ok(conf.texto.startsWith('Hola, Marta:'));
+  assert.strictEqual(conf.asunto, 'He recibido su mensaje');
+  assert.ok(/^(Buenos días|Buenas tardes|Buenas noches), Marta:/.test(conf.texto), conf.texto);
   // Compromiso de plazo
-  assert.ok(conf.texto.includes('Gracias por escribir a AI Resolution Labs. He recibido tu mensaje y ' +
-    'te responderé lo antes posible, como máximo en 72 horas.'));
+  assert.ok(conf.texto.includes('Gracias por escribir a AI Resolution Labs. He recibido su mensaje y ' +
+    'le responderé lo antes posible, como máximo en 72 horas.'));
   assert.ok(conf.o.htmlBody.includes('como máximo en 72 horas.'));
   assert.ok(!conf.texto.includes('próximas'));
   assert.ok(conf.texto.includes('www.airesolutionlabs.com'));
@@ -406,6 +421,141 @@ prueba('normalizaciones sueltas', () => {
   assert.strictEqual(run("slug_('Bad Slug!')"), '');
   assert.strictEqual(run("celda_('-5')"), "'-5");
   assert.strictEqual(run("esc_('<b>&\"')"), '&lt;b&gt;&amp;&quot;');
+});
+
+/* ---- v1.3.0: enlaces fijos, usted, saludo, bloqueo del contador, alias en caché y tiempos ---- */
+
+// Todos los href de un HTML
+const hrefs = (html) => [...html.matchAll(/href="([^"]*)"/g)].map((m) => m[1]);
+const URLS_OK = ['https://cal.com/pablo-ortega-insua-wdoysa', 'https://founder.airesolutionlabs.com/', 'https://www.airesolutionlabs.com/'];
+
+prueba('confirmación: solo enlaza direcciones fijas, aunque el usuario escriba URLs', () => {
+  const env = crearEntorno();
+  const e = tarjetaOk();
+  e.datos.nombre = 'https://malo.example/x Pérez';
+  e.datos.negocio = 'Visite https://malo.example ya';
+  assert.strictEqual(post(env, e).ok, true);
+  const conf = env.enviados[1];
+  for (const h of hrefs(conf.o.htmlBody)) assert.ok(URLS_OK.includes(h), h);
+  assert.ok(!conf.o.htmlBody.includes('malo.example'));
+  assert.ok(!conf.texto.includes('malo.example'));
+  // Sin nombre válido, saluda sin nombre
+  assert.ok(/^(Buenos días|Buenas tardes|Buenas noches):/.test(conf.texto), conf.texto);
+  // El aviso a Pablo sí lleva los datos, escapados
+  assert.ok(env.enviados[0].texto.includes('Visite https://malo.example ya'));
+});
+
+prueba('confirmación de tarjeta: no repite el nombre del negocio', () => {
+  const env = crearEntorno();
+  post(env, tarjetaOk());
+  assert.ok(!env.enviados[1].texto.includes('Clínica Sol'));
+  assert.ok(env.enviados[1].texto.includes('He recibido su solicitud de tarjeta de visita digital.'));
+});
+
+prueba('confirmación: cita enlazada solo en contacto y automatiza, con la URL en el texto plano', () => {
+  for (const [formulario, opts] of [[contactoOk(), deLaWeb], [automatizaOk(), {}]]) {
+    const env = crearEntorno(opts);
+    post(env, formulario);
+    const conf = env.enviados[1];
+    assert.ok(conf.o.htmlBody.includes('<a href="https://cal.com/pablo-ortega-insua-wdoysa">reservar una videollamada conmigo</a>'));
+    assert.ok(conf.texto.includes('puede reservar una videollamada conmigo (https://cal.com/pablo-ortega-insua-wdoysa).'));
+  }
+  const env = crearEntorno();
+  post(env, tarjetaOk());
+  assert.ok(!env.enviados[1].o.htmlBody.includes('cal.com'));
+});
+
+prueba('confirmación: los tres formularios en "usted"', () => {
+  const tuteo = /\b(tu|tus|te|ti|tú|contigo|quieres|prefieres|puedes|has|eres|responde|ignóralo|escríbeme)\b/i;
+  for (const [formulario, opts] of [[tarjetaOk(), {}], [automatizaOk(), {}], [contactoOk(), deLaWeb]]) {
+    const env = crearEntorno(opts);
+    post(env, formulario);
+    const conf = env.enviados[1];
+    assert.ok(!tuteo.test(conf.texto), formulario.formulario + ': ' + (conf.texto.match(tuteo) || [])[0]);
+    assert.ok(!tuteo.test(conf.asunto), conf.asunto);
+    assert.ok(conf.texto.includes('Si no ha sido usted, ignórelo o responda a este correo y borraré los datos.'));
+  }
+});
+
+prueba('saludo según la hora de Madrid', () => {
+  const env = crearEntorno();
+  const saludo = (iso, nombre = 'Lucía Pérez') => env.ctx.saludo_(nombre, new Date(iso));
+  // Octubre: Madrid = UTC+2
+  assert.strictEqual(saludo('2026-10-06T03:59:00Z'), 'Buenas noches, Lucía:');  // 05:59
+  assert.strictEqual(saludo('2026-10-06T04:00:00Z'), 'Buenos días, Lucía:');    // 06:00
+  assert.strictEqual(saludo('2026-10-06T11:59:00Z'), 'Buenos días, Lucía:');    // 13:59
+  assert.strictEqual(saludo('2026-10-06T12:00:00Z'), 'Buenas tardes, Lucía:');  // 14:00
+  assert.strictEqual(saludo('2026-10-06T18:59:00Z'), 'Buenas tardes, Lucía:');  // 20:59
+  assert.strictEqual(saludo('2026-10-06T19:00:00Z'), 'Buenas noches, Lucía:');  // 21:00
+  // Enero: Madrid = UTC+1
+  assert.strictEqual(saludo('2027-01-15T12:59:00Z'), 'Buenos días, Lucía:');    // 13:59
+  assert.strictEqual(saludo('2027-01-15T13:00:00Z'), 'Buenas tardes, Lucía:');  // 14:00
+  // Sin nombre válido
+  assert.strictEqual(saludo('2026-10-06T08:00:00Z', 'www.malo.com'), 'Buenos días:');
+});
+
+prueba('nombre de pila: solo si son letras', () => {
+  const env = crearEntorno();
+  const np = (s) => env.ctx.nombrePila_(s);
+  assert.strictEqual(np('José Luis García'), 'José');
+  assert.strictEqual(np("O'Neill"), "O'Neill");
+  assert.strictEqual(np('María-José'), 'María-José');
+  assert.strictEqual(np('Ángel'), 'Ángel');
+  assert.strictEqual(np('J. Pérez'), 'J.');
+  assert.strictEqual(np('Ñuño'), 'Ñuño');
+  assert.strictEqual(np('Zoë'), 'Zoë');
+  assert.strictEqual(np('Łukasz'), 'Łukasz');
+  assert.strictEqual(np('Mª'), 'Mª');
+  for (const malo of ['12345', 'http://x', 'www.malo.com', 'malo.com', 'a@b.es', '=SUM(A1)', 'Ana--', '', 'x'.repeat(31)]) {
+    assert.strictEqual(np(malo), '', malo);
+  }
+});
+
+prueba('contador ocupado (no se consigue el bloqueo): error interno, sin guardar ni enviar', () => {
+  const env = crearEntorno({ bloqueoOcupado: true });
+  assert.deepStrictEqual(post(env, tarjetaOk()), { ok: false, error: 'interno' });
+  assert.strictEqual(env.filas.length, 0);
+  assert.strictEqual(env.enviados.length, 0);
+});
+
+prueba('alias: se consulta una vez y se recuerda; si falla el envío, se vuelve a consultar', () => {
+  const env = crearEntorno();
+  post(env, tarjetaOk());
+  const e2 = tarjetaOk(); e2.datos.email = 'otra@ejemplo.com';
+  post(env, e2);
+  assert.strictEqual(env.llamadas.alias, 1);
+  assert.strictEqual(env.cache['alias:info@airesolutionlabs.com'], 'si');
+
+  const malo = crearEntorno({ fallaCorreo: true });
+  post(malo, tarjetaOk());
+  assert.strictEqual(malo.cache['alias:info@airesolutionlabs.com'], undefined);
+});
+
+prueba('tiempos: una línea por envío con cada fase', () => {
+  const env = crearEntorno();
+  post(env, tarjetaOk());
+  const linea = JSON.parse(env.logs.find((l) => l.includes('"tiempos"')));
+  assert.strictEqual(linea.resultado, 'ok');
+  assert.strictEqual(linea.id, 'abcdef12');
+  assert.strictEqual(linea.formulario, 'tarjeta');
+  for (const fase of ['arranque', 'turnstile', 'limite', 'hoja', 'alias', 'aviso', 'confirmacion', 'celda']) {
+    assert.strictEqual(typeof linea.ms[fase], 'number', fase);
+  }
+  assert.strictEqual(typeof linea.total, 'number');
+
+  // También se registra cuando se rechaza
+  const env2 = crearEntorno();
+  const e = tarjetaOk(); e.turnstile = 'malo';
+  post(env2, e);
+  const l2 = JSON.parse(env2.logs.find((l) => l.includes('"tiempos"')));
+  assert.strictEqual(l2.resultado, 'verificacion');
+  assert.strictEqual(l2.id, '');
+});
+
+prueba('la columna Confirmación se rellena sin volver a leer las cabeceras', () => {
+  const env = crearEntorno();
+  post(env, tarjetaOk());
+  assert.strictEqual(filaDe(env)['Confirmación'], 'Enviada desde info@airesolutionlabs.com');
 });
 
 console.log(`\n${n} pruebas superadas`);

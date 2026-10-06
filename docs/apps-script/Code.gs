@@ -13,10 +13,16 @@
  *   Ejecutar como: Yo · Quién tiene acceso: Cualquier usuario.
  * Después de cambiar el código: Implementar → Gestionar implementaciones → Editar → Nueva versión
  * (así la URL no cambia).
+ *
+ * Tiempos: cada envío deja en el registro de ejecuciones una línea "tiempos" con los milisegundos de
+ * cada fase (ver docs/formularios.md, "Medir cuánto tarda un envío").
  */
 
+// Momento en que Google carga el script para esta ejecución. Sirve para medir el arranque.
+const INICIO_CARGA_ = Date.now();
+
 const AJUSTES = {
-  VERSION: '1.2.0',
+  VERSION: '1.3.0',
   HOJA: 'Solicitudes',
   HOJA_RESUMEN: 'Resumen',
   AVISO_A: '',                          // vacío = la propia cuenta de Gmail (llega a la bandeja de entrada)
@@ -34,7 +40,13 @@ const AJUSTES = {
   MAX_ENVIOS_POR_EMAIL_HORA: 3,
   MAX_ENVIOS_GLOBAL_10MIN: 30,
   VERSION_TEXTO_LEGAL_ACTUAL: '2026-09-25',
+  ZONA_HORARIA: 'Europe/Madrid',        // para el saludo según la hora
+  ESPERA_BLOQUEO_MS: 10000,             // espera máxima para el contador de envíos
+  CACHE_ALIAS_S: 21600,                 // 6 h: cuánto se recuerda que el alias info@ existe
 };
+
+// Únicas direcciones que pueden ir enlazadas en la confirmación. Nada de lo que escribe el usuario se enlaza.
+const URLS_FIJAS = [AJUSTES.URL_CITA, AJUSTES.URL_TARJETA, AJUSTES.URL_WEB];
 
 const ESTADOS = ['Nuevo', 'Contactado', 'Tarjeta entregada', 'Propuesta enviada', 'Cliente', 'Descartado'];
 
@@ -69,55 +81,103 @@ function doGet() {
 }
 
 function doPost(e) {
+  const t = cronometro_();
+  let salida;
   try {
-    const cuerpo = e && e.postData && e.postData.contents;
-    if (!cuerpo || cuerpo.length > 10000) return respuesta_({ ok: false, error: 'validacion', campos: ['cuerpo'] });
-
-    let entrada;
-    try {
-      entrada = JSON.parse(cuerpo);
-    } catch (err) {
-      return respuesta_({ ok: false, error: 'validacion', campos: ['json'] });
-    }
-
-    const props = PropertiesService.getScriptProperties();
-    const modoPrueba = props.getProperty('TEST_MODE') === 'true';
-
-    // 1. Trampas para bots: se responde "ok" sin guardar nada, para que el bot no aprenda qué falló.
-    if (esBot_(entrada)) return respuesta_({ ok: true, id: 'ok' });
-
-    // 2. Turnstile
-    const verificacion = verificarTurnstile_(entrada.turnstile, props.getProperty('TURNSTILE_SECRET'), modoPrueba);
-    if (!verificacion.ok) return respuesta_({ ok: false, error: 'verificacion' });
-
-    // 3. Esquema y normalización
-    const resultado = validar_(entrada);
-    if (!resultado.ok) return respuesta_({ ok: false, error: 'validacion', campos: resultado.campos });
-    const reg = resultado.registro;
-
-    // 4. Límite de envíos
-    if (!dentroDelLimite_(reg.email)) return respuesta_({ ok: false, error: 'limite' });
-
-    // 5. Guardar
-    reg.id = Utilities.getUuid().slice(0, 8);
-    reg.fecha = new Date();
-    reg.notas = modoPrueba ? 'PRUEBA' : '';
-    reg.confirmacion = 'Pendiente';
-    const fila = guardar_(reg);
-
-    // 6. Correos. Un fallo aquí no invalida la solicitud: ya está guardada.
-    reg.confirmacion = enviarCorreos_(reg);
-    actualizarCelda_(fila, 'Confirmación', reg.confirmacion);
-
-    return respuesta_({ ok: true, id: reg.id });
+    salida = procesar_(e, t);
   } catch (err) {
     console.error('doPost', err && err.stack ? err.stack : err);
-    return respuesta_({ ok: false, error: 'interno' });
+    salida = { ok: false, error: 'interno' };
   }
+  t.registrar(salida);
+  return respuesta_(salida);
+}
+
+function procesar_(e, t) {
+  const cuerpo = e && e.postData && e.postData.contents;
+  if (!cuerpo || cuerpo.length > 10000) return { ok: false, error: 'validacion', campos: ['cuerpo'] };
+
+  let entrada;
+  try {
+    entrada = JSON.parse(cuerpo);
+  } catch (err) {
+    return { ok: false, error: 'validacion', campos: ['json'] };
+  }
+
+  const props = PropertiesService.getScriptProperties();
+  const modoPrueba = props.getProperty('TEST_MODE') === 'true';
+
+  // 1. Trampas para bots: se responde "ok" sin guardar nada, para que el bot no aprenda qué falló.
+  if (esBot_(entrada)) return { ok: true, id: 'ok' };
+
+  // 2. Turnstile
+  const verificacion = verificarTurnstile_(entrada.turnstile, props.getProperty('TURNSTILE_SECRET'), modoPrueba);
+  t.marca('turnstile');
+  if (!verificacion.ok) return { ok: false, error: 'verificacion' };
+
+  // 3. Esquema y normalización
+  const resultado = validar_(entrada);
+  if (!resultado.ok) return { ok: false, error: 'validacion', campos: resultado.campos };
+  const reg = resultado.registro;
+
+  // 4. Límite de envíos (con bloqueo, para que dos envíos simultáneos no lean el mismo contador)
+  const limite = dentroDelLimite_(reg.email);
+  t.marca('limite');
+  if (limite === 'ocupado') return { ok: false, error: 'interno' };
+  if (limite !== 'ok') return { ok: false, error: 'limite' };
+
+  // 5. Guardar
+  reg.id = Utilities.getUuid().slice(0, 8);
+  reg.fecha = new Date();
+  reg.notas = modoPrueba ? 'PRUEBA' : '';
+  reg.confirmacion = 'Pendiente';
+  const guardado = guardar_(reg);
+  t.reg = reg;
+  t.marca('hoja');
+
+  // 6. Correos. Un fallo aquí no invalida la solicitud: ya está guardada.
+  reg.confirmacion = enviarCorreos_(reg, t);
+  if (guardado.colConfirmacion > 0) {
+    guardado.hoja.getRange(guardado.fila, guardado.colConfirmacion).setValue(celda_(reg.confirmacion));
+  }
+  t.marca('celda');
+
+  return { ok: true, id: reg.id };
 }
 
 function respuesta_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * Mide cuánto tarda cada fase y lo deja en el registro de ejecuciones (una línea JSON con "tiempos").
+ * "arranque" es lo que pasa desde que Google carga el script hasta que empieza doPost. El tiempo
+ * que Google tarda antes de cargarlo (arranque en frío) no se ve aquí: es la diferencia entre lo
+ * que espera el navegador y el "total" de esta línea.
+ */
+function cronometro_() {
+  const inicio = Date.now();
+  let anterior = inicio;
+  const ms = { arranque: inicio - INICIO_CARGA_ };
+  return {
+    reg: null, // la solicitud, una vez guardada
+    marca: function (fase) {
+      const ahora = Date.now();
+      ms[fase] = ahora - anterior;
+      anterior = ahora;
+    },
+    registrar: function (salida) {
+      console.log(JSON.stringify({
+        evento: 'tiempos',
+        version: AJUSTES.VERSION,
+        id: this.reg ? this.reg.id : '',
+        formulario: this.reg ? this.reg.formulario : '',
+        resultado: salida.ok ? 'ok' : salida.error,
+        ms: ms,
+        total: Date.now() - inicio,
+      }));
+    },
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -155,16 +215,26 @@ function verificarTurnstile_(token, secreto, modoPrueba) {
   return { ok: true };
 }
 
+/**
+ * Cuenta el envío y dice si cabe: 'ok', 'limite' (se ha pasado) u 'ocupado' (no se pudo bloquear a tiempo).
+ * El bloqueo evita que dos envíos simultáneos lean el mismo valor y ambos pasen.
+ */
 function dentroDelLimite_(email) {
-  const cache = CacheService.getScriptCache();
-  const claveEmail = 'rl:e:' + Utilities.base64EncodeWebSafe(email).slice(0, 200);
-  const claveGlobal = 'rl:g:' + Math.floor(Date.now() / 600000);
-  const nEmail = Number(cache.get(claveEmail) || 0);
-  const nGlobal = Number(cache.get(claveGlobal) || 0);
-  if (nEmail >= AJUSTES.MAX_ENVIOS_POR_EMAIL_HORA || nGlobal >= AJUSTES.MAX_ENVIOS_GLOBAL_10MIN) return false;
-  cache.put(claveEmail, String(nEmail + 1), 3600);
-  cache.put(claveGlobal, String(nGlobal + 1), 600);
-  return true;
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(AJUSTES.ESPERA_BLOQUEO_MS)) return 'ocupado';
+  try {
+    const cache = CacheService.getScriptCache();
+    const claveEmail = 'rl:e:' + Utilities.base64EncodeWebSafe(email).slice(0, 200);
+    const claveGlobal = 'rl:g:' + Math.floor(Date.now() / 600000);
+    const nEmail = Number(cache.get(claveEmail) || 0);
+    const nGlobal = Number(cache.get(claveGlobal) || 0);
+    if (nEmail >= AJUSTES.MAX_ENVIOS_POR_EMAIL_HORA || nGlobal >= AJUSTES.MAX_ENVIOS_GLOBAL_10MIN) return 'limite';
+    cache.put(claveEmail, String(nEmail + 1), 3600);
+    cache.put(claveGlobal, String(nGlobal + 1), 600);
+    return 'ok';
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -378,51 +448,67 @@ function guardar_(reg) {
       return h === 'Fecha' ? valores[h] : celda_(valores[h]);
     });
     hoja.appendRow(fila);
-    return hoja.getLastRow();
+    // Se devuelve la columna de "Confirmación" para no volver a leer las cabeceras después de los correos.
+    return { hoja: hoja, fila: hoja.getLastRow(), colConfirmacion: cabeceras.indexOf('Confirmación') + 1 };
   } finally {
     lock.releaseLock();
   }
-}
-
-function actualizarCelda_(fila, cabecera, valor) {
-  const hoja = hoja_();
-  const cabeceras = hoja.getRange(1, 1, 1, hoja.getLastColumn()).getValues()[0];
-  const col = cabeceras.indexOf(cabecera) + 1;
-  if (col > 0) hoja.getRange(fila, col).setValue(celda_(valor));
 }
 
 /* ------------------------------------------------------------------ */
 /* Correos                                                             */
 /* ------------------------------------------------------------------ */
 
-function enviarCorreos_(reg) {
+function enviarCorreos_(reg, t) {
   const cuota = MailApp.getRemainingDailyQuota();
   const remitente = remitente_();
+  t.marca('alias');
   try {
     if (cuota >= 1) enviarAviso_(reg, remitente);
   } catch (err) {
     console.error('Aviso', err);
   }
+  t.marca('aviso');
   if (cuota < 2) return 'No enviada: cuota diaria agotada';
   try {
     enviarConfirmacion_(reg, remitente);
     return remitente.alias ? 'Enviada desde ' + AJUSTES.REMITENTE : 'Enviada desde la cuenta principal';
   } catch (err) {
     console.error('Confirmación', err);
+    // Si el alias ha dejado de existir, que el siguiente envío lo vuelva a comprobar.
+    if (remitente.alias) olvidarAlias_();
     return 'Error al enviar';
+  } finally {
+    t.marca('confirmacion');
   }
 }
 
+const CLAVE_ALIAS_ = 'alias:' + AJUSTES.REMITENTE;
+
+/** Consultar los alias de Gmail es lento: el resultado se guarda 6 h (10 min si no existe). */
 function remitente_() {
-  let alias = false;
-  try {
-    alias = GmailApp.getAliases().indexOf(AJUSTES.REMITENTE) !== -1;
-  } catch (err) {
-    console.error('Alias', err);
+  const cache = CacheService.getScriptCache();
+  const guardado = cache.get(CLAVE_ALIAS_);
+  let alias = guardado === 'si';
+  if (!guardado) {
+    try {
+      alias = GmailApp.getAliases().indexOf(AJUSTES.REMITENTE) !== -1;
+      cache.put(CLAVE_ALIAS_, alias ? 'si' : 'no', alias ? AJUSTES.CACHE_ALIAS_S : 600);
+    } catch (err) {
+      console.error('Alias', err);
+    }
   }
   const opciones = { name: AJUSTES.NOMBRE_REMITENTE, replyTo: AJUSTES.RESPONDER_A };
   if (alias) opciones.from = AJUSTES.REMITENTE;
   return { alias: alias, opciones: opciones };
+}
+
+function olvidarAlias_() {
+  try {
+    CacheService.getScriptCache().remove(CLAVE_ALIAS_);
+  } catch (err) {
+    console.error('Alias', err);
+  }
 }
 
 function enviarAviso_(reg, remitente) {
@@ -459,59 +545,97 @@ function enviarAviso_(reg, remitente) {
   GmailApp.sendEmail(destino, asunto, texto, opciones);
 }
 
+/**
+ * Confirmación al solicitante, en "usted" y en primera persona.
+ * No repite texto libre del usuario (negocio, mensaje…) para que nadie pueda usar el formulario para
+ * mandar contenido o enlaces a terceros desde info@. Solo se usan su nombre de pila si es un nombre
+ * (letras), su WhatsApp ya validado y las opciones de la lista. Los únicos enlaces son los de URLS_FIJAS.
+ */
 function enviarConfirmacion_(reg, remitente) {
-  const nombre = reg.nombre.split(' ')[0];
+  const cita = ['Si prefiere adelantarlo, puede ', enlace_('reservar una videollamada conmigo', AJUSTES.URL_CITA), '.'];
   let asunto, parrafos;
   if (reg.formulario === 'tarjeta') {
-    asunto = 'Tu tarjeta digital: solicitud recibida';
+    asunto = 'Su tarjeta digital: solicitud recibida';
     parrafos = [
-      'Hola, ' + nombre + ':',
-      'He recibido tu solicitud de tarjeta de visita digital para ' + reg.negocio + '.',
-      'En las próximas ' + AJUSTES.PLAZO_TARJETA + ' te escribo por WhatsApp al ' + reg.whatsapp +
-        ' para pedirte la foto o el logo y terminarla. Si quieres adelantar, responde a este correo con tu logo o tu foto.',
-      'Un saludo,',
+      ['He recibido su solicitud de tarjeta de visita digital.'],
+      ['En las próximas ' + AJUSTES.PLAZO_TARJETA + ' le escribiré por WhatsApp al ' + reg.whatsapp +
+        ' para pedirle la foto o el logo y terminarla. Si quiere adelantarlo, responda a este correo con su logo o su foto.'],
     ];
   } else if (reg.formulario === 'contacto') {
-    asunto = 'He recibido tu mensaje';
+    asunto = 'He recibido su mensaje';
     parrafos = [
-      'Hola, ' + nombre + ':',
-      'Gracias por escribir a AI Resolution Labs. He recibido tu mensaje y te responderé lo antes posible, ' +
-        'como máximo en ' + AJUSTES.PLAZO_CONTACTO + '.',
-      'Si prefieres adelantarlo, puedes reservar una videollamada conmigo aquí: ' + AJUSTES.URL_CITA,
-      'Un saludo,',
+      ['Gracias por escribir a AI Resolution Labs. He recibido su mensaje y le responderé lo antes posible, ' +
+        'como máximo en ' + AJUSTES.PLAZO_CONTACTO + '.'],
+      cita,
     ];
   } else {
-    asunto = 'He recibido tu consulta';
+    asunto = 'He recibido su consulta';
     parrafos = [
-      'Hola, ' + nombre + ':',
-      'He recibido tu consulta sobre ' + reg.que.toLowerCase() + ' y te responderé lo antes posible, ' +
-        'como máximo en ' + AJUSTES.PLAZO_AUTOMATIZA + '.',
-      'Si prefieres adelantarlo, puedes reservar una videollamada conmigo aquí: ' + AJUSTES.URL_CITA,
-      'Un saludo,',
+      ['He recibido su consulta sobre ' + reg.que.toLowerCase() + ' y le responderé lo antes posible, ' +
+        'como máximo en ' + AJUSTES.PLAZO_AUTOMATIZA + '.'],
+      cita,
     ];
   }
+  parrafos.unshift([saludo_(reg.nombre, reg.fecha || new Date())]);
+  parrafos.push(['Un saludo,']);
+
   const origen = reg.formulario === 'contacto' ? AJUSTES.URL_WEB : AJUSTES.URL_TARJETA;
-  const firma = ['Pablo Ortega Insúa', 'AI Resolution Labs', origen];
-  const pie = 'Recibes este correo porque se ha enviado un formulario en ' + origen +
-    ' con esta dirección. Si no has sido tú, ignóralo o respóndenos y borraremos los datos.';
+  const dominio = origen.replace('https://', '').replace(/\/$/, '');
+  const pie = 'Recibe este correo porque se ha enviado un formulario en ' + dominio +
+    ' con esta dirección. Si no ha sido usted, ignórelo o responda a este correo y borraré los datos.';
 
   const html =
     '<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.55;color:#0B1B3D;max-width:560px">' +
-    parrafos.map(function (p) { return '<p>' + enlazar_(esc_(p)) + '</p>'; }).join('') +
-    '<p style="margin-top:0"><strong>' + esc_(firma[0]) + '</strong><br>' + esc_(firma[1]) + '<br>' +
-    '<a href="' + firma[2] + '">' + firma[2].replace('https://', '').replace(/\/$/, '') + '</a></p>' +
+    parrafos.map(function (p) { return '<p>' + partesHtml_(p) + '</p>'; }).join('') +
+    '<p style="margin-top:0"><strong>Pablo Ortega Insúa</strong><br>AI Resolution Labs<br>' +
+    partesHtml_([enlace_(dominio, origen)]) + '</p>' +
     '<p style="font-size:12px;color:#667">' + esc_(pie) + '</p></div>';
-  const texto = parrafos.join('\n\n') + '\n' + firma.join('\n') + '\n\n' + pie;
+  const texto = parrafos.map(partesTexto_).join('\n\n') +
+    '\nPablo Ortega Insúa\nAI Resolution Labs\n' + origen + '\n\n' + pie;
 
   GmailApp.sendEmail(reg.email, asunto, texto, Object.assign({}, remitente.opciones, { htmlBody: html }));
 }
 
-function esc_(s) {
-  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+/** "Buenos días" hasta las 14:00, "Buenas tardes" hasta las 21:00 y "Buenas noches" el resto (hora de Madrid). */
+function saludo_(nombreCompleto, fecha) {
+  const hora = Number(Utilities.formatDate(fecha, AJUSTES.ZONA_HORARIA, 'H'));
+  const base = hora >= 6 && hora < 14 ? 'Buenos días' : (hora >= 14 && hora < 21 ? 'Buenas tardes' : 'Buenas noches');
+  const nombre = nombrePila_(nombreCompleto);
+  return base + (nombre ? ', ' + nombre : '') + ':';
 }
 
-function enlazar_(s) {
-  return s.replace(/(https:\/\/[^\s<]+)/g, '<a href="$1">$1</a>');
+/**
+ * Primera palabra del nombre, solo si es un nombre: letras, con apóstrofo o guion entre letras y un punto
+ * final opcional (O'Neill, María-José, J.). Un punto en medio no: "www.algo.com" se convertiría en enlace.
+ */
+function nombrePila_(nombreCompleto) {
+  const primero = String(nombreCompleto || '').split(' ')[0];
+  return primero.length <= 30 && NOMBRE_PILA_.test(primero) ? primero : '';
+}
+// Letras latinas con tildes y diéresis (rangos explícitos en vez de \p{L}, por compatibilidad).
+const NOMBRE_PILA_ = /^[A-Za-zÀ-ÖØ-öø-ÿĀ-žªº]+(?:['’-][A-Za-zÀ-ÖØ-öø-ÿĀ-žªº]+)*\.?$/;
+
+/** Enlace a una dirección fija. Si la dirección no está en URLS_FIJAS, se queda en texto sin enlace. */
+function enlace_(texto, url) {
+  return { texto: texto, url: URLS_FIJAS.indexOf(url) !== -1 ? url : '' };
+}
+
+function partesHtml_(partes) {
+  return partes.map(function (p) {
+    if (typeof p === 'string') return esc_(p);
+    return p.url ? '<a href="' + esc_(p.url) + '">' + esc_(p.texto) + '</a>' : esc_(p.texto);
+  }).join('');
+}
+
+function partesTexto_(partes) {
+  return partes.map(function (p) {
+    if (typeof p === 'string') return p;
+    return p.url && p.url.replace('https://', '').replace(/\/$/, '') !== p.texto ? p.texto + ' (' + p.url + ')' : p.texto;
+  }).join('');
+}
+
+function esc_(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function sinSaltos_(s) {
@@ -624,10 +748,12 @@ function columnaALetra_(n) {
   return s;
 }
 
-/** Comprueba la configuración y lo escribe en el registro de ejecución. */
+/** Comprueba la configuración y lo escribe en el registro de ejecución. Ejecútalo también si cambias el alias de info@. */
 function comprobarConfiguracion() {
   const props = PropertiesService.getScriptProperties();
+  olvidarAlias_(); // vuelve a comprobar el alias en el siguiente envío
   const info = {
+    version: AJUSTES.VERSION,
     hoja: !!SpreadsheetApp.getActiveSpreadsheet().getSheetByName(AJUSTES.HOJA),
     turnstileSecret: !!props.getProperty('TURNSTILE_SECRET'),
     modoPrueba: props.getProperty('TEST_MODE') === 'true',
