@@ -3,21 +3,20 @@
 // - Recursos estáticos (imágenes, fuentes, manifest): primero la caché.
 // Si cambias una imagen, una fuente o el manifest sin cambiarle el nombre, sube CACHE_VERSION
 // para que los visitantes descarguen la versión nueva.
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_PREFIX = 'tarjeta-';
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
     './',
     'manifest.webmanifest',
-    'fonts/outfit-400.woff2',
-    'fonts/outfit-500.woff2',
-    'fonts/outfit-600.woff2',
-    'fonts/outfit-700.woff2',
+    'fonts/manrope-latin-wght-normal.woff2',
     'img/perfil-240.webp',
     'img/perfil-480.webp',
     'img/perfil-fallback.svg',
-    'img/favicon-32.png',
+    'img/qr-founder.svg',
+    'img/favicon.svg',
+    'img/favicon.ico',
     'img/apple-touch-icon.png',
     'img/icon-192.png',
     'img/icon-512.png',
