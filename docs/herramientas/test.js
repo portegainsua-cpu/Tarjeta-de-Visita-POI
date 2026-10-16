@@ -130,8 +130,8 @@ prueba('automatiza válida: neutraliza fórmulas y ofrece Cal.com', () => {
   assert.ok(env.enviados[1].texto.includes('cal.com'));
   // Compromiso de plazo en la confirmación
   assert.ok(env.enviados[1].texto.includes(
-    'He recibido su consulta sobre citas y reservas y le responderé lo antes posible, como máximo en 72 horas.'));
-  assert.ok(env.enviados[1].o.htmlBody.includes('como máximo en 72 horas.'));
+    'He recibido su consulta sobre citas y reservas y le responderé lo antes posible, como máximo en 48 horas.'));
+  assert.ok(env.enviados[1].o.htmlBody.includes('como máximo en 48 horas.'));
   assert.ok(!env.enviados[1].texto.includes('próximas'));
 });
 
@@ -251,8 +251,8 @@ prueba('contacto válido desde la web: guarda en Solicitudes y envía aviso y co
   assert.ok(/^(Buenos días|Buenas tardes|Buenas noches), Marta:/.test(conf.texto), conf.texto);
   // Compromiso de plazo
   assert.ok(conf.texto.includes('Gracias por escribir a AI Resolution Labs. He recibido su mensaje y ' +
-    'le responderé lo antes posible, como máximo en 72 horas.'));
-  assert.ok(conf.o.htmlBody.includes('como máximo en 72 horas.'));
+    'le responderé lo antes posible, como máximo en 48 horas.'));
+  assert.ok(conf.o.htmlBody.includes('como máximo en 48 horas.'));
   assert.ok(!conf.texto.includes('próximas'));
   assert.ok(conf.texto.includes('www.airesolutionlabs.com'));
   assert.ok(!conf.texto.includes('founder.airesolutionlabs.com'));
