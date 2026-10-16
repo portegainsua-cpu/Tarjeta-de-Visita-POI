@@ -22,7 +22,7 @@
 const INICIO_CARGA_ = Date.now();
 
 const AJUSTES = {
-  VERSION: '1.3.0',
+  VERSION: '1.3.1',
   HOJA: 'Solicitudes',
   HOJA_RESUMEN: 'Resumen',
   AVISO_A: '',                          // vacío = la propia cuenta de Gmail (llega a la bandeja de entrada)
