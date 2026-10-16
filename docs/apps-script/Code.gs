@@ -33,8 +33,8 @@ const AJUSTES = {
   URL_TARJETA: 'https://founder.airesolutionlabs.com/',
   URL_WEB: 'https://www.airesolutionlabs.com/',
   PLAZO_TARJETA: '48 horas',            // PENDIENTE de confirmar por Pablo
-  PLAZO_AUTOMATIZA: '72 horas',
-  PLAZO_CONTACTO: '72 horas',
+  PLAZO_AUTOMATIZA: '48 horas',
+  PLAZO_CONTACTO: '48 horas',
   HOSTS_PERMITIDOS: ['founder.airesolutionlabs.com', 'www.airesolutionlabs.com'],
   RELLENO_MINIMO_MS: 3000,
   MAX_ENVIOS_POR_EMAIL_HORA: 3,
