@@ -558,4 +558,237 @@ prueba('la columna Confirmación se rellena sin volver a leer las cabeceras', ()
   assert.strictEqual(filaDe(env)['Confirmación'], 'Enviada desde info@airesolutionlabs.com');
 });
 
+/* ---- v1.4.0: columnas Canal y Último contacto, reglas de configurarHoja() y Resumen ---- */
+
+// Compara el contenido: los arrays creados dentro del script (vm) tienen otro prototipo
+const igual = (a, b, m) => assert.deepStrictEqual(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b)), m);
+
+prueba('CABECERAS: Canal detrás de Formulario y Último contacto detrás de Estado', () => {
+  const env = crearEntorno();
+  igual(env.cabeceras.slice(0, 6), ['Fecha', 'ID', 'Formulario', 'Canal', 'Estado', 'Último contacto']);
+  igual(Array.from(vm.runInContext('CANALES', env.ctx)),
+    ['Cal.com', 'Tarjeta', 'Web', 'WhatsApp', 'Instagram', 'LinkedIn', 'Email', 'Recomendación', 'En persona']);
+  assert.strictEqual(vm.runInContext('AJUSTES', env.ctx).VERSION, '1.4.0');
+});
+
+prueba('guardar_: Canal según el formulario (tarjeta y automatiza → Tarjeta, contacto → Web) y Último contacto vacío', () => {
+  for (const [cuerpo, canal, opts] of [[tarjetaOk(), 'Tarjeta', {}], [automatizaOk(), 'Tarjeta', {}], [contactoOk(), 'Web', deLaWeb]]) {
+    const env = crearEntorno(opts);
+    assert.strictEqual(post(env, cuerpo).ok, true, cuerpo.formulario);
+    const f = filaDe(env);
+    assert.strictEqual(f['Canal'], canal, cuerpo.formulario);
+    assert.strictEqual(f['Último contacto'], '', cuerpo.formulario);
+    assert.strictEqual(f['Estado'], 'Nuevo', cuerpo.formulario);
+  }
+});
+
+// Hoja de cálculo simulada para configurarHoja(): registra validaciones, formatos, reglas y el Resumen
+function crearHojaSimulada({ cabeceras = [], reglasPrevias = [], locale = 'es_ES' } = {}) {
+  const reg = { cab: cabeceras.slice(), validaciones: {}, formatos: {}, congeladas: null, filasCongeladas: null, reglas: null, resumen: { valores: null, formulas: null } };
+  const cadena = (extra = {}) => new Proxy(extra, { get: (o, k) => (k in o ? o[k] : () => cadena(extra)) });
+  const rango = (fila, col, nf, nc) => cadena({
+    getColumn: () => col, getNumColumns: () => nc, getRow: () => fila,
+    getValues: () => [reg.cab.slice(col - 1, col - 1 + nc)],
+    setValues: (v) => { if (fila === 1) v[0].forEach((x, i) => { reg.cab[col - 1 + i] = x; }); return rango(fila, col, nf, nc); },
+    setDataValidation: (v) => { reg.validaciones[reg.cab[col - 1]] = v; return rango(fila, col, nf, nc); },
+    setNumberFormat: (f) => { reg.formatos[reg.cab[col - 1]] = f; return rango(fila, col, nf, nc); },
+  });
+  const hoja = cadena({
+    getLastColumn: () => reg.cab.length, getMaxRows: () => 1000, getRange: rango,
+    setFrozenRows: (n) => { reg.filasCongeladas = n; }, setFrozenColumns: (n) => { reg.congeladas = n; },
+    getConditionalFormatRules: () => reglasPrevias, setConditionalFormatRules: (r) => { reg.reglas = r; },
+  });
+  const resumen = cadena({
+    getRange: (a, b, nf, nc) => cadena({
+      setValues: (v) => { if (a === 4) reg.resumen.valores = v; return cadena(); },
+      setFormulas: (f) => { reg.resumen.formulas = f; return cadena(); },
+    }),
+  });
+  let hayResumen = false;
+  const ss = cadena({
+    getSheetByName: (n) => (n === 'Solicitudes' ? hoja : (hayResumen ? resumen : null)),
+    insertSheet: () => { hayResumen = true; return resumen; },
+    getSheets: () => [hoja], getSpreadsheetLocale: () => locale,
+  });
+  const constructor = () => {
+    const r = { getRanges: () => r.ranges };
+    const b = {
+      whenFormulaSatisfied: (f) => { r.formula = f; return b; },
+      whenTextEqualTo: (t) => { r.texto = t; return b; },
+      setBackground: (c) => { r.fondo = c; return b; },
+      setRanges: (x) => { r.ranges = x; return b; },
+      build: () => r,
+    };
+    return b;
+  };
+  const validacion = () => {
+    const v = {};
+    const b = { requireValueInList: (l, d) => { v.lista = l; v.desplegable = d; return b; }, setAllowInvalid: (x) => { v.permiteInvalidos = x; return b; }, build: () => v };
+    return b;
+  };
+  const ctx = { console, SpreadsheetApp: { getActiveSpreadsheet: () => ss, newDataValidation: validacion, newConditionalFormatRule: constructor } };
+  vm.createContext(ctx);
+  const local = __dirname + '/Code.gs';
+  vm.runInContext(fs.readFileSync(fs.existsSync(local) ? local : __dirname + '/../apps-script/Code.gs', 'utf8'), ctx);
+  return { ctx, reg };
+}
+
+// Regla previa simulada (por ejemplo, añadida a mano) sobre las columnas col..ultima
+const reglaPrevia = (col, texto, ultima = col) => ({
+  texto,
+  getRanges: () => [{ getColumn: () => col, getLastColumn: () => ultima, getNumColumns: () => ultima - col + 1 }],
+});
+
+prueba('configurarHoja(): desplegables, columnas inmovilizadas por encabezado y formatos', () => {
+  const env0 = crearEntorno();
+  const { ctx, reg } = crearHojaSimulada({ cabeceras: env0.cabeceras });
+  assert.strictEqual(ctx.configurarHoja(), 'Hoja configurada');
+  assert.strictEqual(reg.filasCongeladas, 1);
+  assert.strictEqual(reg.congeladas, 6); // A:F, hasta "Último contacto"
+  igual(Array.from(reg.validaciones['Canal'].lista), Array.from(vm.runInContext('CANALES', ctx)));
+  assert.strictEqual(reg.validaciones['Canal'].permiteInvalidos, false);
+  igual(Array.from(reg.validaciones['Estado'].lista), Array.from(vm.runInContext('ESTADOS', ctx)));
+  assert.strictEqual(reg.validaciones['Estado'].permiteInvalidos, false);
+  assert.strictEqual(reg.formatos['Último contacto'], 'dd/mm/yyyy');
+});
+
+prueba('configurarHoja(): inmoviliza hasta "Último contacto" aunque cambie de posición', () => {
+  const env0 = crearEntorno();
+  const cab = env0.cabeceras.filter((h) => h !== 'Último contacto');
+  cab.splice(7, 0, 'Último contacto'); // ahora en la columna 8 (H)
+  const { ctx, reg } = crearHojaSimulada({ cabeceras: cab });
+  ctx.configurarHoja();
+  assert.strictEqual(reg.congeladas, 8);
+  assert.strictEqual(reg.reglas[0].getRanges()[0].getColumn(), 8);
+  assert.ok(reg.reglas[0].formula.includes('$H2'));
+});
+
+prueba('configurarHoja(): hoja vacía → escribe las cabeceras en orden con Canal (D) y Último contacto (F)', () => {
+  const { ctx, reg } = crearHojaSimulada({ cabeceras: [] });
+  ctx.configurarHoja();
+  igual(reg.cab.slice(0, 6), ['Fecha', 'ID', 'Formulario', 'Canal', 'Estado', 'Último contacto']);
+  assert.strictEqual(reg.congeladas, 6);
+});
+
+prueba('configurarHoja(): lista de reglas (roja, naranja, estados) y conserva las de otras columnas', () => {
+  const env0 = crearEntorno();
+  const previas = [
+    reglaPrevia(6, 'roja manual'), reglaPrevia(6, 'naranja manual'), // las dos puestas a mano en "Último contacto"
+    reglaPrevia(5, 'Nuevo'),                                          // color de estado antiguo
+    reglaPrevia(10, 'regla de Email puesta a mano'),                  // otra columna: se conserva
+  ];
+  const { ctx, reg } = crearHojaSimulada({ cabeceras: env0.cabeceras, reglasPrevias: previas });
+  ctx.configurarHoja();
+  const r = reg.reglas;
+  assert.strictEqual(r.length, 2 + 6 + 1);
+
+  // 1 y 2: enfriamiento en "Último contacto" (F); la roja va antes que la naranja
+  const activos = '($E2="Nuevo")+($E2="Contactado")+($E2="Tarjeta entregada")+($E2="Propuesta enviada")';
+  assert.strictEqual(r[0].formula, '=((' + activos + ')*(TODAY()-($F2+($F2="")*$A2)>14))>0');
+  assert.strictEqual(r[0].fondo, '#f4cccc');
+  assert.strictEqual(r[1].formula, '=((' + activos + ')*(TODAY()-($F2+($F2="")*$A2)>7))>0');
+  assert.strictEqual(r[1].fondo, '#f9cb9c');
+  for (const x of r.slice(0, 2)) {
+    assert.strictEqual(x.getRanges().length, 1);
+    assert.strictEqual(x.getRanges()[0].getColumn(), 6);
+    assert.ok(!/[,;]/.test(x.formula), 'sin separadores de argumentos: ' + x.formula);
+  }
+
+  // 3 a 8: colores por estado, solo en la columna Estado (E)
+  igual(r.slice(2, 8).map((x) => x.texto), Array.from(vm.runInContext('ESTADOS', ctx)));
+  for (const x of r.slice(2, 8)) igual(x.getRanges().map((g) => g.getColumn()), [5]);
+
+  // 9: la regla de otra columna se conserva; las antiguas de F y E no se duplican
+  assert.strictEqual(r[8].texto, 'regla de Email puesta a mano');
+  assert.ok(!r.some((x) => /manual$/.test(x.texto || '')));
+});
+
+prueba('configurarHoja(): sustituye las reglas de E2:F1000 (Estado + Último contacto) y conserva las de E2:G1000', () => {
+  const env0 = crearEntorno();
+  const previas = [
+    // Los 6 colores de Estado que Sheets amplió a E2:F1000 al insertar "Último contacto": se sustituyen
+    ...['Nuevo', 'Contactado', 'Tarjeta entregada', 'Propuesta enviada', 'Cliente', 'Descartado'].map((e) => reglaPrevia(5, 'E:F ' + e, 6)),
+    reglaPrevia(5, 'E:G se conserva', 7),     // toca también la columna G (Nombre): se conserva
+    reglaPrevia(6, 'F:F antigua', 6),         // solo Último contacto: se sustituye
+    reglaPrevia(4, 'D:E se conserva', 5),     // toca Canal (D): se conserva
+  ];
+  const { ctx, reg } = crearHojaSimulada({ cabeceras: env0.cabeceras, reglasPrevias: previas });
+  ctx.configurarHoja();
+  const textos = reg.reglas.map((x) => x.texto || x.formula);
+  assert.strictEqual(reg.reglas.length, 2 + 6 + 2);
+  assert.ok(!textos.some((t) => /^E:F |^F:F/.test(t)), 'las reglas de E:F y F:F no se duplican: ' + textos.join(' | '));
+  igual(textos.slice(8), ['E:G se conserva', 'D:E se conserva']);
+  // Los colores de Estado nuevos van solo en la columna E
+  igual(reg.reglas.slice(2, 8).map((x) => x.getRanges().map((g) => g.getColumn())), [[5], [5], [5], [5], [5], [5]]);
+});
+
+prueba('fórmula de enfriamiento: rojo a partir de 15 días, naranja de 8 a 14, solo estados abiertos', () => {
+  const env0 = crearEntorno();
+  const { ctx } = crearHojaSimulada({ cabeceras: env0.cabeceras });
+  const HOY = 46000;
+  // Evalúa la fórmula de Sheets en JavaScript para la fila 2 (E = Estado, F = Último contacto, A = Fecha)
+  const evalua = (formula, celdas) => {
+    const js = formula.slice(1)
+      .replace(/TODAY\(\)/g, String(HOY))
+      .replace(/\$([A-Z])2/g, (_, l) => JSON.stringify(celdas[l] === undefined ? '' : celdas[l]))
+      .replace(/="/g, '==="');
+    return Function('return (' + js + ')')();
+  };
+  const cab = env0.cabeceras;
+  const roja = ctx.formulaEnfriamiento_(cab, 14), naranja = ctx.formulaEnfriamiento_(cab, 7);
+  const color = (celdas) => (evalua(roja, celdas) ? 'rojo' : evalua(naranja, celdas) ? 'naranja' : 'ninguno');
+  assert.strictEqual(color({ E: 'Nuevo', A: HOY - 20 }), 'rojo');                       // sin último contacto: cuenta desde Fecha
+  assert.strictEqual(color({ E: 'Nuevo', A: HOY - 10.5 }), 'naranja');
+  assert.strictEqual(color({ E: 'Nuevo', A: HOY - 3 }), 'ninguno');
+  assert.strictEqual(color({ E: 'Contactado', A: HOY - 40, F: HOY - 3 }), 'ninguno');   // el último contacto manda
+  assert.strictEqual(color({ E: 'Propuesta enviada', A: HOY - 40, F: HOY - 15 }), 'rojo');
+  assert.strictEqual(color({ E: 'Tarjeta entregada', A: HOY - 40, F: HOY - 8 }), 'naranja');
+  assert.strictEqual(color({ E: 'Cliente', A: HOY - 40 }), 'ninguno');                   // estados cerrados: sin color
+  assert.strictEqual(color({ E: 'Descartado', A: HOY - 40 }), 'ninguno');
+  assert.strictEqual(color({}), 'ninguno');                                              // fila vacía
+});
+
+prueba('configurarResumen_: columnas Tarjeta, Automatiza, Contacto, Manual y Total, e indicadores de enfriamiento', () => {
+  const env0 = crearEntorno();
+  const { ctx, reg } = crearHojaSimulada({ cabeceras: env0.cabeceras });
+  ctx.configurarHoja();
+  const [cab, ...filas] = reg.resumen.valores;
+  igual(cab, ['Indicador', 'Tarjeta', 'Automatiza', 'Contacto', 'Manual', 'Total']);
+  const etiquetas = filas.map((f) => f[0]);
+  igual(etiquetas.slice(-2), ['Enfriándose (más de 7 días)', 'Frías (más de 14 días)']);
+  const f = reg.resumen.formulas;
+  assert.strictEqual(f.length, filas.length);
+  for (const fila of f) assert.strictEqual(fila.length, 5);
+
+  // Solicitudes recibidas: una columna por formulario y Total como suma
+  const recibidas = f[0];
+  ['Tarjeta', 'Automatiza', 'Contacto', 'Manual'].forEach((t, i) => {
+    assert.ok(recibidas[i].startsWith('=COUNTIFS(') && recibidas[i].includes('"' + t + '"') && recibidas[i].includes('"<>PRUEBA"'), recibidas[i]);
+  });
+  assert.strictEqual(recibidas[4], '=SUM(B5:E5)');
+  assert.ok(recibidas[0].includes(';'), 'en español, el separador es ;');
+
+  // Enfriamiento: misma lógica que el formato condicional, sin PRUEBA
+  const enfr = f[f.length - 2], frias = f[f.length - 1];
+  for (const [fila, desde, hasta] of [[enfr, '>7', '<=14'], [frias, '>14', null]]) {
+    fila.slice(0, 4).forEach((x, i) => {
+      assert.ok(x.startsWith('=SUMPRODUCT('), x);
+      assert.ok(x.includes(`'Solicitudes'!C2:C="${['Tarjeta', 'Automatiza', 'Contacto', 'Manual'][i]}"`), x);
+      assert.ok(x.includes(`'Solicitudes'!W2:W<>"PRUEBA"`) || x.includes('<>"PRUEBA"'), x);
+      assert.ok(x.includes(`'Solicitudes'!E2:E="Propuesta enviada"`) && !x.includes('"Cliente"'), x);
+      assert.ok(x.includes(`TODAY()-('Solicitudes'!F2:F+('Solicitudes'!F2:F="")*'Solicitudes'!A2:A)`), x);
+      assert.ok(x.includes(desde), x);
+      assert.strictEqual(x.includes('<='), !!hasta, x);
+      assert.ok(!/[,;]/.test(x), 'SUMPRODUCT de un solo argumento, sin separadores: ' + x);
+    });
+  }
+});
+
+prueba('configurarResumen_: separador "," si la hoja está en inglés', () => {
+  const env0 = crearEntorno();
+  const { ctx, reg } = crearHojaSimulada({ cabeceras: env0.cabeceras, locale: 'en_US' });
+  ctx.configurarHoja();
+  assert.ok(reg.resumen.formulas[0][0].includes(',') && !reg.resumen.formulas[0][0].includes(';'));
+});
+
 console.log(`\n${n} pruebas superadas`);
