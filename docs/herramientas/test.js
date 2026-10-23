@@ -633,8 +633,11 @@ function crearHojaSimulada({ cabeceras = [], reglasPrevias = [], locale = 'es_ES
   return { ctx, reg };
 }
 
-// Regla previa simulada (por ejemplo, añadida a mano) sobre una columna
-const reglaPrevia = (col, texto) => ({ texto, getRanges: () => [{ getColumn: () => col, getNumColumns: () => 1 }] });
+// Regla previa simulada (por ejemplo, añadida a mano) sobre las columnas col..ultima
+const reglaPrevia = (col, texto, ultima = col) => ({
+  texto,
+  getRanges: () => [{ getColumn: () => col, getLastColumn: () => ultima, getNumColumns: () => ultima - col + 1 }],
+});
 
 prueba('configurarHoja(): desplegables, columnas inmovilizadas por encabezado y formatos', () => {
   const env0 = crearEntorno();
@@ -698,6 +701,25 @@ prueba('configurarHoja(): lista de reglas (roja, naranja, estados) y conserva la
   // 9: la regla de otra columna se conserva; las antiguas de F y E no se duplican
   assert.strictEqual(r[8].texto, 'regla de Email puesta a mano');
   assert.ok(!r.some((x) => /manual$/.test(x.texto || '')));
+});
+
+prueba('configurarHoja(): sustituye las reglas de E2:F1000 (Estado + Último contacto) y conserva las de E2:G1000', () => {
+  const env0 = crearEntorno();
+  const previas = [
+    // Los 6 colores de Estado que Sheets amplió a E2:F1000 al insertar "Último contacto": se sustituyen
+    ...['Nuevo', 'Contactado', 'Tarjeta entregada', 'Propuesta enviada', 'Cliente', 'Descartado'].map((e) => reglaPrevia(5, 'E:F ' + e, 6)),
+    reglaPrevia(5, 'E:G se conserva', 7),     // toca también la columna G (Nombre): se conserva
+    reglaPrevia(6, 'F:F antigua', 6),         // solo Último contacto: se sustituye
+    reglaPrevia(4, 'D:E se conserva', 5),     // toca Canal (D): se conserva
+  ];
+  const { ctx, reg } = crearHojaSimulada({ cabeceras: env0.cabeceras, reglasPrevias: previas });
+  ctx.configurarHoja();
+  const textos = reg.reglas.map((x) => x.texto || x.formula);
+  assert.strictEqual(reg.reglas.length, 2 + 6 + 2);
+  assert.ok(!textos.some((t) => /^E:F |^F:F/.test(t)), 'las reglas de E:F y F:F no se duplican: ' + textos.join(' | '));
+  igual(textos.slice(8), ['E:G se conserva', 'D:E se conserva']);
+  // Los colores de Estado nuevos van solo en la columna E
+  igual(reg.reglas.slice(2, 8).map((x) => x.getRanges().map((g) => g.getColumn())), [[5], [5], [5], [5], [5], [5]]);
 });
 
 prueba('fórmula de enfriamiento: rojo a partir de 15 días, naranja de 8 a 14, solo estados abiertos', () => {

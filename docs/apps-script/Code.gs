@@ -715,7 +715,8 @@ function configurarHoja() {
  * setConditionalFormatRules sustituye TODAS las reglas de la hoja, así que aquí se devuelven:
  *   1. Enfriamiento en "Último contacto": rojo (más de 14 días) y después naranja (más de 7 días).
  *   2. Colores por estado, solo en la columna "Estado".
- *   3. Cualquier otra regla que ya hubiera en la hoja fuera de esas dos columnas (se conserva tal cual).
+ *   3. Cualquier otra regla que ya hubiera en la hoja y toque alguna columna distinta de esas dos
+ *      (se conserva tal cual).
  */
 function reglasFormato_(hoja, cab) {
   const col = function (h) { return cab.indexOf(h) + 1; };
@@ -737,13 +738,21 @@ function reglasFormato_(hoja, cab) {
       .setRanges([rangoEstado]).build());
   });
 
-  // Reglas añadidas a mano en otras columnas: se conservan
+  // Una regla anterior es "propia" (y se sustituye por las de arriba) solo si TODAS las columnas de
+  // TODOS sus rangos son Estado o Último contacto. Ejemplo: los colores de Estado en E2:F1000, que
+  // Sheets amplió al insertar "Último contacto". Las que tocan cualquier otra columna se conservan.
   const propias = [col('Estado'), col('Último contacto')];
-  hoja.getConditionalFormatRules().forEach(function (regla) {
-    const enPropias = regla.getRanges().some(function (r) {
-      return propias.indexOf(r.getColumn()) !== -1 && r.getNumColumns() === 1;
+  const esPropia = function (regla) {
+    const rangos = regla.getRanges();
+    return rangos.length > 0 && rangos.every(function (r) {
+      for (let c = r.getColumn(); c <= r.getLastColumn(); c++) {
+        if (propias.indexOf(c) === -1) return false;
+      }
+      return true;
     });
-    if (!enPropias) reglas.push(regla);
+  };
+  hoja.getConditionalFormatRules().forEach(function (regla) {
+    if (!esPropia(regla)) reglas.push(regla);
   });
   return reglas;
 }
