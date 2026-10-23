@@ -22,7 +22,9 @@
 const INICIO_CARGA_ = Date.now();
 
 const AJUSTES = {
-  VERSION: '1.3.1',
+  VERSION: '1.4.0',
+  COLOR_ENFRIANDOSE: '#f9cb9c',         // naranja claro: más de 7 días sin contacto
+  COLOR_FRIA: '#f4cccc',                // rojo claro: más de 14 días sin contacto
   HOJA: 'Solicitudes',
   HOJA_RESUMEN: 'Resumen',
   AVISO_A: '',                          // vacío = la propia cuenta de Gmail (llega a la bandeja de entrada)
@@ -50,12 +52,21 @@ const URLS_FIJAS = [AJUSTES.URL_CITA, AJUSTES.URL_TARJETA, AJUSTES.URL_WEB];
 
 const ESTADOS = ['Nuevo', 'Contactado', 'Tarjeta entregada', 'Propuesta enviada', 'Cliente', 'Descartado'];
 
+// Estados en los que una solicitud puede "enfriarse" (colores de "Último contacto" y Resumen)
+const ESTADOS_ACTIVOS = ['Nuevo', 'Contactado', 'Tarjeta entregada', 'Propuesta enviada'];
+
 const CABECERAS = [
-  'Fecha', 'ID', 'Formulario', 'Estado', 'Nombre', 'Negocio / Empresa', 'Cargo', 'Sector',
+  'Fecha', 'ID', 'Formulario', 'Canal', 'Estado', 'Último contacto', 'Nombre', 'Negocio / Empresa', 'Cargo', 'Sector',
   'WhatsApp', 'Email', 'Instagram', 'Web', 'Botones', 'Qué más mejorar', 'Tamaño',
   'Qué automatizar', 'Descripción', 'Contacto preferido', 'Referido', 'Acepta comunicaciones',
   'Versión texto legal', 'Confirmación', 'Notas',
 ];
+
+// Canal por el que llega la solicitud (desplegable de la columna "Canal", en este orden)
+const CANALES = ['Cal.com', 'Tarjeta', 'Web', 'WhatsApp', 'Instagram', 'LinkedIn', 'Email', 'Recomendación', 'En persona'];
+
+// Canal que se rellena automáticamente según el formulario
+const CANAL_FORMULARIO = { tarjeta: 'Tarjeta', automatiza: 'Tarjeta', contacto: 'Web' };
 
 // Formularios admitidos y cómo aparecen en la columna "Formulario" de la hoja
 const NOMBRES_FORMULARIO = { tarjeta: 'Tarjeta', automatiza: 'Automatiza', contacto: 'Contacto' };
@@ -417,6 +428,8 @@ function guardar_(reg) {
     'Fecha': reg.fecha,
     'ID': reg.id,
     'Formulario': NOMBRES_FORMULARIO[reg.formulario],
+    'Canal': CANAL_FORMULARIO[reg.formulario],
+    'Último contacto': '',
     'Estado': 'Nuevo',
     'Nombre': reg.nombre,
     'Negocio / Empresa': reg.negocio,
@@ -666,33 +679,93 @@ function configurarHoja() {
   hoja.getRange(1, 1, 1, ncol)
     .setFontWeight('bold').setFontColor('#FFFFFF').setBackground('#0B1B3D').setWrap(true)
     .setVerticalAlignment('middle');
-  hoja.setFrozenRows(1);
-  hoja.setFrozenColumns(4);
   const cab = hoja.getRange(1, 1, 1, ncol).getValues()[0];
   const col = function (h) { return cab.indexOf(h) + 1; };
+  const filas = hoja.getMaxRows() - 1;
+  const columna = function (h) { return hoja.getRange(2, col(h), filas, 1); };
 
-  const reglaEstado = SpreadsheetApp.newDataValidation().requireValueInList(ESTADOS, true).setAllowInvalid(false).build();
-  hoja.getRange(2, col('Estado'), hoja.getMaxRows() - 1, 1).setDataValidation(reglaEstado);
-  hoja.getRange(2, col('Fecha'), hoja.getMaxRows() - 1, 1).setNumberFormat('dd/mm/yyyy hh:mm');
-  hoja.getRange(2, col('WhatsApp'), hoja.getMaxRows() - 1, 1).setNumberFormat('@');
+  // Filas y columnas inmovilizadas: hasta "Último contacto", buscándola por su encabezado
+  hoja.setFrozenRows(1);
+  hoja.setFrozenColumns(col('Último contacto'));
 
-  const anchos = { 'Fecha': 120, 'ID': 80, 'Formulario': 95, 'Estado': 140, 'Nombre': 160, 'Negocio / Empresa': 180,
-    'Email': 210, 'WhatsApp': 120, 'Botones': 220, 'Qué más mejorar': 240, 'Qué automatizar': 240,
-    'Descripción': 320, 'Notas': 260, 'Confirmación': 190 };
+  // Desplegables: rechazan valores fuera de la lista
+  const lista = function (valores) {
+    return SpreadsheetApp.newDataValidation().requireValueInList(valores, true).setAllowInvalid(false).build();
+  };
+  columna('Estado').setDataValidation(lista(ESTADOS));
+  columna('Canal').setDataValidation(lista(CANALES));
+
+  columna('Fecha').setNumberFormat('dd/mm/yyyy hh:mm');
+  columna('Último contacto').setNumberFormat('dd/mm/yyyy');
+  columna('WhatsApp').setNumberFormat('@');
+
+  const anchos = { 'Fecha': 120, 'ID': 80, 'Formulario': 95, 'Canal': 115, 'Estado': 140, 'Último contacto': 120,
+    'Nombre': 160, 'Negocio / Empresa': 180, 'Email': 210, 'WhatsApp': 120, 'Botones': 220, 'Qué más mejorar': 240,
+    'Qué automatizar': 240, 'Descripción': 320, 'Notas': 260, 'Confirmación': 190 };
   Object.keys(anchos).forEach(function (h) { if (col(h)) hoja.setColumnWidth(col(h), anchos[h]); });
 
-  // Colores por estado
-  const rango = hoja.getRange(2, col('Estado'), hoja.getMaxRows() - 1, 1);
-  const colores = { 'Nuevo': '#DBEAFE', 'Contactado': '#FEF3C7', 'Tarjeta entregada': '#E0E7FF',
-    'Propuesta enviada': '#FCE7F3', 'Cliente': '#D1FAE5', 'Descartado': '#F3F4F6' };
-  const reglas = Object.keys(colores).map(function (estado) {
-    return SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo(estado).setBackground(colores[estado])
-      .setRanges([rango]).build();
-  });
-  hoja.setConditionalFormatRules(reglas);
+  hoja.setConditionalFormatRules(reglasFormato_(hoja, cab));
 
   configurarResumen_(ss, cab);
   return 'Hoja configurada';
+}
+
+/**
+ * Lista completa de reglas de formato condicional de la pestaña Solicitudes.
+ * setConditionalFormatRules sustituye TODAS las reglas de la hoja, así que aquí se devuelven:
+ *   1. Enfriamiento en "Último contacto": rojo (más de 14 días) y después naranja (más de 7 días).
+ *   2. Colores por estado, solo en la columna "Estado".
+ *   3. Cualquier otra regla que ya hubiera en la hoja fuera de esas dos columnas (se conserva tal cual).
+ */
+function reglasFormato_(hoja, cab) {
+  const col = function (h) { return cab.indexOf(h) + 1; };
+  const filas = hoja.getMaxRows() - 1;
+  const rangoEstado = hoja.getRange(2, col('Estado'), filas, 1);
+  const rangoContacto = hoja.getRange(2, col('Último contacto'), filas, 1);
+
+  const reglas = [
+    SpreadsheetApp.newConditionalFormatRule().whenFormulaSatisfied(formulaEnfriamiento_(cab, 14))
+      .setBackground(AJUSTES.COLOR_FRIA).setRanges([rangoContacto]).build(),
+    SpreadsheetApp.newConditionalFormatRule().whenFormulaSatisfied(formulaEnfriamiento_(cab, 7))
+      .setBackground(AJUSTES.COLOR_ENFRIANDOSE).setRanges([rangoContacto]).build(),
+  ];
+
+  const colores = { 'Nuevo': '#DBEAFE', 'Contactado': '#FEF3C7', 'Tarjeta entregada': '#E0E7FF',
+    'Propuesta enviada': '#FCE7F3', 'Cliente': '#D1FAE5', 'Descartado': '#F3F4F6' };
+  Object.keys(colores).forEach(function (estado) {
+    reglas.push(SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo(estado).setBackground(colores[estado])
+      .setRanges([rangoEstado]).build());
+  });
+
+  // Reglas añadidas a mano en otras columnas: se conservan
+  const propias = [col('Estado'), col('Último contacto')];
+  hoja.getConditionalFormatRules().forEach(function (regla) {
+    const enPropias = regla.getRanges().some(function (r) {
+      return propias.indexOf(r.getColumn()) !== -1 && r.getNumColumns() === 1;
+    });
+    if (!enPropias) reglas.push(regla);
+  });
+  return reglas;
+}
+
+/**
+ * Fórmula de enfriamiento para la fila 2 (Sheets la desplaza al resto de filas del rango).
+ * Verdadera si el Estado está en ESTADOS_ACTIVOS y han pasado más de "dias" días desde
+ * "Último contacto" o, si está vacío, desde "Fecha".
+ *
+ * Locale: la documentación de whenFormulaSatisfied no dice si la fórmula debe escribirse en inglés
+ * con comas o con la configuración regional de la hoja (español, con ";"); su único ejemplo usa
+ * inglés y comas ('=EQ(B4, C3)'). Para no depender de eso, esta fórmula NO usa separadores de
+ * argumentos: solo comparaciones, sumas, productos y TODAY(), el nombre inglés, como en el ejemplo
+ * oficial. Una celda vacía vale 0 en una suma, así que F2+(F2="")*A2 es "Último contacto" o, si está
+ * vacío, "Fecha". Ejemplo con D=Estado, F=Último contacto y A=Fecha:
+ *   =((($D2="Nuevo")+($D2="Contactado")+($D2="Tarjeta entregada")+($D2="Propuesta enviada"))*(TODAY()-($F2+($F2="")*$A2)>14))>0
+ */
+function formulaEnfriamiento_(cab, dias) {
+  const letra = function (h) { return columnaALetra_(cab.indexOf(h) + 1); };
+  const e = '$' + letra('Estado') + '2', u = '$' + letra('Último contacto') + '2', f = '$' + letra('Fecha') + '2';
+  const activo = ESTADOS_ACTIVOS.map(function (estado) { return '(' + e + '="' + estado + '")'; }).join('+');
+  return '=((' + activo + ')*(TODAY()-(' + u + '+(' + u + '="")*' + f + ')>' + dias + '))>0';
 }
 
 function configurarResumen_(ss, cab) {
@@ -702,35 +775,53 @@ function configurarResumen_(ss, cab) {
   // Las fórmulas se interpretan con la configuración regional de la hoja: en español el separador es ';'.
   const S = separador_(ss);
   const letra = function (h) { return columnaALetra_(cab.indexOf(h) + 1); };
-  const F = letra('Formulario'), E = letra('Estado'), D = letra('Fecha'), N = letra('Notas');
+  const F = letra('Formulario'), E = letra('Estado'), D = letra('Fecha'), N = letra('Notas'), U = letra('Último contacto');
   const h = "'" + AJUSTES.HOJA + "'!";
   const sinPruebas = S + h + N + ':' + N + S + '"<>PRUEBA"';
-  const etiquetas = [['Indicador', 'Tarjeta', 'Automatiza', 'Total']];
+  const tipos = ['Tarjeta', 'Automatiza', 'Contacto', 'Manual'];
+  const columnas = ['Indicador'].concat(tipos, ['Total']);
+  const etiquetas = [columnas];
   const formulas = [];
-  const add = function (etiqueta, extra) {
+  const fila = function (etiqueta, porTipo) {
     const r = etiquetas.length + 4;
-    etiquetas.push([etiqueta, '', '', '']);
-    formulas.push([
-      '=COUNTIFS(' + h + F + ':' + F + S + '"Tarjeta"' + extra + sinPruebas + ')',
-      '=COUNTIFS(' + h + F + ':' + F + S + '"Automatiza"' + extra + sinPruebas + ')',
-      '=B' + r + '+C' + r]);
+    etiquetas.push([etiqueta].concat(tipos.map(function () { return ''; }), ['']));
+    formulas.push(tipos.map(porTipo).concat(['=SUM(B' + r + ':' + columnaALetra_(tipos.length + 1) + r + ')']));
   };
-  add('Solicitudes recibidas', '');
-  ESTADOS.forEach(function (e) { add('Estado: ' + e, S + h + E + ':' + E + S + '"' + e + '"'); });
-  add('Últimos 7 días', S + h + D + ':' + D + S + '">="&(TODAY()-7)');
-  add('Últimos 30 días', S + h + D + ':' + D + S + '">="&(TODAY()-30)');
+  const contar = function (etiqueta, extra) {
+    fila(etiqueta, function (tipo) { return '=COUNTIFS(' + h + F + ':' + F + S + '"' + tipo + '"' + extra + sinPruebas + ')'; });
+  };
+  // Enfriamiento: la misma lógica que el formato condicional de "Último contacto", sin filas de PRUEBA.
+  // SUMPRODUCT con un único argumento: no necesita separadores. Rangos desde la fila 2 hasta el final.
+  const enfriamiento = function (etiqueta, desde, hasta) {
+    const r = function (l) { return h + l + '2:' + l; };
+    const activo = ESTADOS_ACTIVOS.map(function (estado) { return '(' + r(E) + '="' + estado + '")'; }).join('+');
+    const dias = '(TODAY()-(' + r(U) + '+(' + r(U) + '="")*' + r(D) + '))';
+    const tramo = '(' + dias + '>' + desde + ')' + (hasta ? '*(' + dias + '<=' + hasta + ')' : '');
+    fila(etiqueta, function (tipo) {
+      return '=SUMPRODUCT((' + r(F) + '="' + tipo + '")*(' + r(N) + '<>"PRUEBA")*(' + activo + ')*' + tramo + ')';
+    });
+  };
 
+  contar('Solicitudes recibidas', '');
+  ESTADOS.forEach(function (e) { contar('Estado: ' + e, S + h + E + ':' + E + S + '"' + e + '"'); });
+  contar('Últimos 7 días', S + h + D + ':' + D + S + '">="&(TODAY()-7)');
+  contar('Últimos 30 días', S + h + D + ':' + D + S + '">="&(TODAY()-30)');
+  enfriamiento('Enfriándose (más de 7 días)', 7, 14);
+  enfriamiento('Frías (más de 14 días)', 14, 0);
+
+  const ancho = columnas.length;
   rs.getRange('A1').setValue('Resumen de solicitudes').setFontWeight('bold').setFontSize(14);
-  rs.getRange('A2').setValue('Se calcula a partir de la pestaña Solicitudes. No cuenta las filas marcadas como PRUEBA.')
+  rs.getRange('A2').setValue('Se calcula a partir de la pestaña Solicitudes. No cuenta las filas marcadas como PRUEBA. ' +
+    'Enfriándose: más de 7 días y hasta 14 sin contacto (naranja); frías: más de 14 días (rojo); solo estados abiertos.')
     .setFontStyle('italic').setFontColor('#666666');
-  rs.getRange(4, 1, etiquetas.length, 4).setValues(etiquetas);
-  rs.getRange(5, 2, formulas.length, 3).setFormulas(formulas);
-  rs.getRange(4, 1, 1, 4).setFontWeight('bold').setFontColor('#FFFFFF').setBackground('#0B1B3D');
+  rs.getRange(4, 1, etiquetas.length, ancho).setValues(etiquetas);
+  rs.getRange(5, 2, formulas.length, ancho - 1).setFormulas(formulas);
+  rs.getRange(4, 1, 1, ancho).setFontWeight('bold').setFontColor('#FFFFFF').setBackground('#0B1B3D');
   const r = etiquetas.length + 5;
   rs.getRange(r, 1).setValue('Criterio para pasar al sistema semiautomático').setFontWeight('bold');
   rs.getRange(r + 1, 1).setValue('Pendiente de definir. Propuesta: revisar al llegar a 20 tarjetas entregadas o a los 60 días; si 2 o más acaban en una venta de pago, construir el autoservicio.').setWrap(true);
   rs.setColumnWidth(1, 330);
-  rs.setColumnWidths(2, 3, 100);
+  rs.setColumnWidths(2, ancho - 1, 100);
 }
 
 /** Separador de argumentos de las fórmulas según la configuración regional de la hoja. */
